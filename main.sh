@@ -67,7 +67,7 @@ fi
 
 [[ -z "$SKIP_FOLDERS" ]] && skip_folders_option='' || skip_folders_option="--skip-folders='$SKIP_FOLDERS'"
 
-/usr/games/cowsay "Hello world"
+/usr/games/cowsay "Hello worlds"
 
 /usr/games/cowsay "Running with the flag $phpcs_standard"
 
