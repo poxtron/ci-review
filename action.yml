@@ -3,7 +3,7 @@ description: 'This will run phpcs on PRs'
 author: 'rtCamp'
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'docker://poxtron/ci-review:latest'
 branding:
   icon: 'check-circle'
   color: 'green'
