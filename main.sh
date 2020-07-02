@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+
+
+
 #cd $GITHUB_WORKSPACE || exit 0
 #
 COMMIT_ID=$(cat $GITHUB_EVENT_PATH | jq -r '.pull_request.head.sha')
@@ -14,7 +17,7 @@ chown -R etbot:etbot /home/etbot/
 gosu etbot bash -c "cd /home/etbot/marketplace-phpcs && composer install"
 
 #gosu etbot bash -c "/usr/local/bin/run-review.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN"
-gosu etbot bash -c "/usr/local/bin/run-review.php $COMMIT_ID $PR_BODY $GITHUB_REPO_NAME $GITHUB_REPO_OWNER $GITHUB_EVENT_PATH $GITHUB_REPOSITORY"
+gosu etbot bash -c "/usr/local/bin/run-review.php $COMMIT_ID $PR_BODY $GITHUB_REPO_NAME $GITHUB_REPO_OWNER $GITHUB_EVENT_PATH $GITHUB_REPOSITORY $GH_BOT_TOKEN"
 
 #if [[ "$PR_BODY" == *"[do-not-scan]"* ]]; then
 #  echo "[do-not-scan] found in PR description. Skipping PHPCS scan."
