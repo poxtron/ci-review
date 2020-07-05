@@ -35,41 +35,18 @@ composer install
 cd "$GITHUB_WORKSPACE"
 
 COMMIT_ID=$(cat $GITHUB_EVENT_PATH | jq -r '.pull_request.head.sha')
-PR_BODY=$(cat "$GITHUB_EVENT_PATH" | jq -r .pull_request.body)
+#PR_BODY=$(cat "$GITHUB_EVENT_PATH" | jq -r .pull_request.body)
 GITHUB_REPO_NAME=${GITHUB_REPOSITORY##*/}
 GITHUB_REPO_OWNER=${GITHUB_REPOSITORY%%/*}
 
 phpcs_standard="$GITHUB_WORKSPACE"/rules
 phpcs_path="$GITHUB_WORKSPACE"/rules/vendor/bin/phpcs
 
+export BOT_WORKSPACE="/home/etstaging/github-workspace"
 
-echo "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=$phpcs_path --local-git-repo=$GITHUB_WORKSPACE --phpcs=true $phpcs_standard"
+rsync -a "$GITHUB_WORKSPACE/" "$BOT_WORKSPACE"
+chown -R etstaging:etstaging "$BOT_WORKSPACE"
 
-./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=$phpcs_path --local-git-repo=$GITHUB_WORKSPACE --phpcs=true $phpcs_standard
+echo "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=$phpcs_path --local-git-repo=$BOT_WORKSPACE --phpcs=true $phpcs_standard"
 
-#ls -lR
-
-#exit 1;
-
-
-
-#
-#
-#
-#COMMIT_ID=$(cat $GITHUB_EVENT_PATH | jq -r '.pull_request.head.sha')
-#PR_BODY=$(cat "$GITHUB_EVENT_PATH" | jq -r .pull_request.body)
-#GITHUB_REPO_NAME=${GITHUB_REPOSITORY##*/}
-#GITHUB_REPO_OWNER=${GITHUB_REPOSITORY%%/*}
-#chown -R etbot:etbot /home/etbot/
-#gosu etbot bash -c "cd /home/etbot/marketplace-phpcs && composer install"
-#gosu etbot bash -c "/usr/local/bin/run-review.php $COMMIT_ID $PR_BODY $GITHUB_REPO_NAME $GITHUB_REPO_OWNER $GITHUB_EVENT_PATH $GITHUB_REPOSITORY $GH_BOT_TOKEN"
-
-# custom path for files to override default files
-#custom_path="$GITHUB_WORKSPACE/.github/inspections/vip-go-ci/"
-#main_script="/usr/local/bin/main.sh"
-
-#if [[ -d "$custom_path" ]]; then
-#    rsync -a "$custom_path" /usr/local/bin/
-#fi
-
-#bash "$main_script" "$@"
+gosu etstaging bash -c "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=$phpcs_path --local-git-repo=$BOT_WORKSPACE --phpcs=true $phpcs_standard"

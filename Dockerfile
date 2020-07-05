@@ -1,7 +1,7 @@
 FROM elegantthemes/php:7.4.5
 
 LABEL "com.github.actions.icon"="check-circle"
-LABEL "com.github.actions.color"="green"
+LABEL "com.github.actions.color"="orange"
 LABEL "com.github.actions.name"="PHPCS Code Review"
 LABEL "com.github.actions.description"="This will run phpcs on PRs"
 
@@ -18,13 +18,7 @@ RUN set -eux; \
 	wget \
 	git;
 
-#RUN useradd -m -s /bin/bash etbot
-
-# TODO maybe create modified one just to make sure we have the latest version
-#RUN wget https://raw.githubusercontent.com/Automattic/vip-go-ci/master/tools-init.sh -O tools-init.sh && \
-#	bash tools-init.sh && \
-#	rm -f tools-init.sh
-
+RUN useradd -m -s /bin/bash etstaging
 
 COPY entrypoint.sh main.sh run-review.php /usr/local/bin/
 RUN chmod +x /usr/local/bin/*.sh /usr/local/bin/run-review.php
