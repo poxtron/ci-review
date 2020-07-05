@@ -6,9 +6,9 @@ if [[ -z "$GH_BOT_TOKEN" ]]; then
     exit 1
 fi
 
-cat $GITHUB_EVENT_PATH
-
-exit 1
+#cat $GITHUB_EVENT_PATH
+#
+#exit 1
 
 # shellcheck disable=SC2164
 cd "$GITHUB_WORKSPACE"
@@ -23,7 +23,6 @@ tar -xzvf $GOCI_VERSION.tar.gz
 mkdir -p vip-go-ci
 
 mv $current_version/* vip-go-ci
-
 mv $current_version/.* vip-go-ci
 
 rm -r $current_version $GOCI_VERSION.tar.gz
@@ -41,13 +40,16 @@ GITHUB_REPO_NAME=${GITHUB_REPOSITORY##*/}
 GITHUB_REPO_OWNER=${GITHUB_REPOSITORY%%/*}
 
 phpcs_standard="$GITHUB_WORKSPACE"/rules
+phpcs_path="$GITHUB_WORKSPACE"/rules/vendor/bin/phpcs
 
 
-./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=/home/rtbot/vip-go-ci-tools/phpcs/bin/phpcs --local-git-repo=/home/rtbot/github-workspace --phpcs=true $phpcs_standard
+echo "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=$phpcs_path --local-git-repo=$GITHUB_WORKSPACE --phpcs=true $phpcs_standard"
 
-ls -lR
+./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=$phpcs_path --local-git-repo=$GITHUB_WORKSPACE --phpcs=true $phpcs_standard
 
-exit 1;
+#ls -lR
+
+#exit 1;
 
 
 
