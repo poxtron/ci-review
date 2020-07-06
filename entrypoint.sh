@@ -49,4 +49,4 @@ chown -R etstaging:etstaging "$BOT_WORKSPACE"
 
 echo "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=$phpcs_path --local-git-repo=$BOT_WORKSPACE --phpcs=true $phpcs_standard"
 
-gosu etstaging bash -c "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=$phpcs_path --local-git-repo=$BOT_WORKSPACE/repo --phpcs=true $phpcs_standard"
+gosu etstaging bash -c "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=$phpcs_path --local-git-repo=$BOT_WORKSPACE/repo --phpcs=true --phpcs-standard=$phpcs_standard"
