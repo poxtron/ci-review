@@ -16,36 +16,33 @@ function vipgoci_unittests_get_config_value(
 			dirname( __FILE__ ) . '/../unittests.ini',
 			true
 		);
-	}
-
-	else {
+	} else {
 		$ini_array = parse_ini_file(
 			dirname( __FILE__ ) . '/../unittests-secrets.ini',
 			true
 		);
 	}
 
-
 	if ( false === $ini_array ) {
 		return null;
-	}	
+	}
 
 	if ( isset(
 		$ini_array
-			[ $section ]
-			[ $key ]
+		[ $section ]
+		[ $key ]
 	) ) {
 		if ( empty(
-			$ini_array
-				[ $section ]
-				[ $key ]
+		$ini_array
+		[ $section ]
+		[ $key ]
 		) ) {
 			return null;
 		}
-			
+
 		return $ini_array
-			[ $section ]
-			[ $key ];
+		[ $section ]
+		[ $key ];
 	}
 
 	return null;
@@ -55,19 +52,18 @@ function vipgoci_unittests_get_config_values( $section, &$config_arr, $secret_fi
 	foreach (
 		array_keys( $config_arr ) as $config_key
 	) {
-		$config_arr[ $config_key ] =
-			vipgoci_unittests_get_config_value(
-				$section,
-				$config_key,
-				$secret_file
-			);
+		$config_arr[ $config_key ]
+			= vipgoci_unittests_get_config_value(
+			$section,
+			$config_key,
+			$secret_file
+		);
 
 		if ( empty( $config_arr[ $config_key ] ) ) {
 			$config_arr[ $config_key ] = null;
 		}
 	}
 }
-
 
 /*
  * Clone a git-repository and check out a
@@ -85,20 +81,17 @@ function vipgoci_unittests_setup_git_repo(
 		return false;
 	}
 
-
 	$res = unlink( $temp_dir );
 
 	if ( false === $res ) {
 		return false;
 	}
 
-
 	$res = mkdir( $temp_dir );
 
 	if ( false === $res ) {
 		return false;
 	}
-
 
 	$cmd = sprintf(
 		'%s clone %s %s 2>&1',
@@ -112,20 +105,17 @@ function vipgoci_unittests_setup_git_repo(
 
 	$res = exec( $cmd, $cmd_output, $cmd_status );
 
-	$cmd_output = implode( PHP_EOL, $cmd_output);
+	$cmd_output = implode( PHP_EOL, $cmd_output );
 
-	if (
-		( null === $cmd_output ) ||
-		( false !== strpos( $cmd_output, 'fatal' ) ) ||
-		( 0 !== $cmd_status )
-	) {
+	if ( ( null === $cmd_output )
+	     || ( false !== strpos( $cmd_output, 'fatal' ) )
+	     || ( 0 !== $cmd_status ) ) {
 		return false;
 	}
 
 	unset( $cmd );
 	unset( $cmd_output );
 	unset( $cmd_status );
-
 
 	$cmd = sprintf(
 		'%s -C %s checkout %s 2>&1',
@@ -139,20 +129,17 @@ function vipgoci_unittests_setup_git_repo(
 
 	$res = exec( $cmd, $cmd_output, $cmd_status );
 
-	$cmd_output = implode( PHP_EOL, $cmd_output);
+	$cmd_output = implode( PHP_EOL, $cmd_output );
 
-	if (
-		( null === $cmd_output ) ||
-		( false !== strpos( $cmd_output, 'fatal:' ) ) ||
-		( 0 !== $cmd_status )
-	) {
+	if ( ( null === $cmd_output )
+	     || ( false !== strpos( $cmd_output, 'fatal:' ) )
+	     || ( 0 !== $cmd_status ) ) {
 		return false;
 	}
 
 	unset( $cmd );
 	unset( $cmd_output );
 	unset( $cmd_status );
-
 
 	return $temp_dir;
 }
@@ -178,9 +165,9 @@ function vipgoci_unittests_remove_git_repo( $repo_path ) {
 	 * do not do anything.
 	 */
 	if ( false === strstr(
-		$repo_path,
-		$temp_dir
-	) ) {
+			$repo_path,
+			$temp_dir
+		) ) {
 		return false;
 	}
 
@@ -202,7 +189,7 @@ function vipgoci_unittests_remove_git_repo( $repo_path ) {
 	/*
 	 * Prepare to run the rm -rf command.
 	 */
-	
+
 	$cmd = sprintf(
 		'%s -rf %s',
 		escapeshellcmd( 'rm' ),
@@ -212,16 +199,14 @@ function vipgoci_unittests_remove_git_repo( $repo_path ) {
 	$cmd_output = '';
 	$cmd_status = 0;
 
-	/* 
+	/*
 	 * Run it and check results.
 	 */
 	$res = exec( $cmd, $cmd_output, $cmd_status );
 
 	if ( $cmd_status === 0 ) {
 		return true;
-	}
-
-	else {
+	} else {
 		printf(
 			"Warning: Not able to remove temporary directory successfully; %i, %s",
 			$cmd_status,
@@ -243,7 +228,7 @@ function vipgoci_unittests_options_test(
 		$options
 	);
 
-	foreach(
+	foreach (
 		$options_keys as $option_key
 	) {
 		if ( in_array(
@@ -253,10 +238,8 @@ function vipgoci_unittests_options_test(
 			continue;
 		}
 
-		if (
-			( '' === $options[ $option_key ] ) ||
-			( null === $options[ $option_key ] )
-		) {
+		if ( ( '' === $options[ $option_key ] )
+		     || ( null === $options[ $option_key ] ) ) {
 			if ( '' !== $missing_options_str ) {
 				$missing_options_str .= ', ';
 			}
@@ -270,7 +253,7 @@ function vipgoci_unittests_options_test(
 			'Skipping test, not configured correctly, as some options are missing (' . $missing_options_str . ')'
 		);
 
-		return -1;
+		return - 1;
 	}
 
 	return 0;
@@ -282,12 +265,10 @@ function vipgoci_unittests_debug_mode_on() {
 	 * debug-mode on.
 	 */
 
-	if (
-		( in_array( '-v', $_SERVER['argv'] ) ) ||
-		( in_array( '-vv', $_SERVER['argv'] ) ) ||
-		( in_array( '-vvv', $_SERVER['argv'] ) ) ||
-		( in_array( '--debug', $_SERVER['argv'] ) )
-	) {
+	if ( ( in_array( '-v', $_SERVER['argv'] ) )
+	     || ( in_array( '-vv', $_SERVER['argv'] ) )
+	     || ( in_array( '-vvv', $_SERVER['argv'] ) )
+	     || ( in_array( '--debug', $_SERVER['argv'] ) ) ) {
 		return true;
 	}
 

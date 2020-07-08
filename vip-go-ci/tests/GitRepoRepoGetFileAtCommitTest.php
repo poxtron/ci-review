@@ -5,55 +5,20 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class GitRepoRepoGetFileAtCommitTest extends TestCase {
-	var $options_git = array(
-		'repo-owner'			=> null,
-		'repo-name'			=> null,
-		'git-path'			=> null,
-		'github-repo-url'		=> null,
-	);
+	var $options_git
+		= [
+			'repo-owner'      => null,
+			'repo-name'       => null,
+			'git-path'        => null,
+			'github-repo-url' => null,
+		];
 
 	// Use auto-approval settings for repository-data
-	var $options_auto_approvals_nonfunc = array(
-		'commit-test-repo-get-file-at-commit-1'		=> null,
-		'commit-test-repo-get-file-at-commit-2'		=> null,
-	);
-
-	protected function setUp() {
-		vipgoci_unittests_get_config_values(
-			'git',
-			$this->options_git
-		);
-
-		vipgoci_unittests_get_config_values(
-			'auto-approvals',
-			$this->options_auto_approvals_nonfunc
-		);
-
-		$this->options = array_merge(
-			$this->options_git,
-			$this->options_auto_approvals_nonfunc
-		);
-
-		$this->options['commit'] =
-			$this->options['commit-test-repo-get-file-at-commit-2'];
-
-		$this->options['local-git-repo'] =
-			vipgoci_unittests_setup_git_repo(
-				$this->options
-			);
-	}
-
-	protected function tearDown() {
-		if ( false !== $this->options['local-git-repo'] ) {
-			vipgoci_unittests_remove_git_repo(
-				$this->options['local-git-repo']
-			);
-		}
-
-		$this->options = null;
-		$this->options_git = null;
-		$this->options_auto_approvals_nonfunc = null;
-	}
+	var $options_auto_approvals_nonfunc
+		= [
+			'commit-test-repo-get-file-at-commit-1' => null,
+			'commit-test-repo-get-file-at-commit-2' => null,
+		];
 
 	/**
 	 * @covers ::vipgoci_gitrepo_get_file_at_commit
@@ -61,14 +26,14 @@ final class GitRepoRepoGetFileAtCommitTest extends TestCase {
 	public function testGetFileData1() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array(
+			[
 				'commit-test-repo-get-file-at-commit-1',
 				'commit-test-repo-get-file-at-commit-2'
-			),
+			],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -109,7 +74,6 @@ final class GitRepoRepoGetFileAtCommitTest extends TestCase {
 			sha1( $file_content )
 		);
 
-
 		/*
 		 * Same with file2.php.
 		 */
@@ -145,5 +109,42 @@ final class GitRepoRepoGetFileAtCommitTest extends TestCase {
 			'f8c824b9bc01a5655e77a10a3f2e5fa704a58f9c',
 			sha1( $file_content )
 		);
+	}
+
+	protected function setUp() {
+		vipgoci_unittests_get_config_values(
+			'git',
+			$this->options_git
+		);
+
+		vipgoci_unittests_get_config_values(
+			'auto-approvals',
+			$this->options_auto_approvals_nonfunc
+		);
+
+		$this->options = array_merge(
+			$this->options_git,
+			$this->options_auto_approvals_nonfunc
+		);
+
+		$this->options['commit']
+			= $this->options['commit-test-repo-get-file-at-commit-2'];
+
+		$this->options['local-git-repo']
+			= vipgoci_unittests_setup_git_repo(
+			$this->options
+		);
+	}
+
+	protected function tearDown() {
+		if ( false !== $this->options['local-git-repo'] ) {
+			vipgoci_unittests_remove_git_repo(
+				$this->options['local-git-repo']
+			);
+		}
+
+		$this->options                        = null;
+		$this->options_git                    = null;
+		$this->options_auto_approvals_nonfunc = null;
 	}
 }

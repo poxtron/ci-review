@@ -9,17 +9,11 @@ final class MiscCacheTest extends TestCase {
 	 * @covers ::vipgoci_cache
 	 */
 	public function testCache1() {
-		$cache_id1 =
-			__CLASS__ .
-			'_' . 
-			__FUNCTION__ .
-			'_mytest1';
+		$cache_id1
+			= __CLASS__ . '_' . __FUNCTION__ . '_mytest1';
 
-		$cache_id2 =
-			__CLASS__ .
-			'_' . 
-			__FUNCTION__ .
-			'_mytest2';
+		$cache_id2
+			= __CLASS__ . '_' . __FUNCTION__ . '_mytest2';
 
 		$r1 = openssl_random_pseudo_bytes(
 			100
@@ -55,7 +49,6 @@ final class MiscCacheTest extends TestCase {
 			$r2_retrieved
 		);
 
-
 		$this->assertNotEquals(
 			$r1,
 			$r2
@@ -73,10 +66,8 @@ final class MiscCacheTest extends TestCase {
 	 * @covers ::vipgoci_cache
 	 */
 	public function testCache2() {
-		$cache_id =
-			__CLASS__ .
-			'_' . 
-			__FUNCTION__;
+		$cache_id
+			= __CLASS__ . '_' . __FUNCTION__;
 
 		/*
 		 * Clear cache.

@@ -1,6 +1,5 @@
 <?php
 
-
 /*
  * Determine if repository specified is in
  * sync with the commit-ID specified.
@@ -12,7 +11,6 @@ function vipgoci_gitrepo_ok(
 	$commit_id,
 	$local_git_repo
 ) {
-
 	/*
 	 * Check at what revision the local git repository is.
 	 *
@@ -24,7 +22,6 @@ function vipgoci_gitrepo_ok(
 	$lgit_head = vipgoci_gitrepo_get_head(
 		$local_git_repo
 	);
-
 
 	/*
 	 * Trim any whitespace characters away
@@ -40,33 +37,27 @@ function vipgoci_gitrepo_ok(
 		);
 	}
 
-
 	/*
 	 * Check if commit-ID and head are the same, and
 	 * return with a status accordingly.
 	 */
 
-	if (
-		( false !== $commit_id ) &&
-		( $commit_id !== $lgit_head )
-	) {
+	if ( ( false !== $commit_id )
+	     && ( $commit_id !== $lgit_head ) ) {
 		vipgoci_log(
-			'Can not use local Git repository, seems not to be in ' .
-			'sync with current commit or does not exist',
-			array(
-				'commit_id'		=> $commit_id,
-				'local_git_repo'	=> $local_git_repo,
-				'local_git_repo_head'	=> $lgit_head,
-			)
+			'Can not use local Git repository, seems not to be in ' . 'sync with current commit or does not exist',
+			[
+				'commit_id'           => $commit_id,
+				'local_git_repo'      => $local_git_repo,
+				'local_git_repo_head' => $lgit_head,
+			]
 		);
 
 		exit ( 253 );
-
 	}
 
 	return true;
 }
-
 
 /*
  * Get latest commit HEAD in the specified repository.
@@ -75,7 +66,6 @@ function vipgoci_gitrepo_ok(
  */
 
 function vipgoci_gitrepo_get_head( $local_git_repo ) {
-
 	/*
 	 * Prepare to execute git; ask git to
 	 * operate within a certain path ( -C param ),
@@ -101,7 +91,6 @@ function vipgoci_gitrepo_get_head( $local_git_repo ) {
 	return $result;
 }
 
-
 /*
  * Fetch "tree" of the repository; a tree
  * of files that are part of the commit
@@ -116,31 +105,32 @@ function vipgoci_gitrepo_fetch_tree(
 	$commit_id,
 	$filter = null
 ) {
-
 	/* Check for cached version */
-	$cached_id = array(
-		__FUNCTION__, $options['repo-owner'], $options['repo-name'],
-		$commit_id, $options['token'], $filter
-	);
+	$cached_id = [
+		__FUNCTION__,
+		$options['repo-owner'],
+		$options['repo-name'],
+		$commit_id,
+		$options['token'],
+		$filter
+	];
 
 	$cached_data = vipgoci_cache( $cached_id );
 
 	vipgoci_log(
-		'Fetching tree info' .
-			( $cached_data ? ' (cached)' : '' ),
+		'Fetching tree info' . ( $cached_data ? ' (cached)' : '' ),
 
-		array(
+		[
 			'repo_owner' => $options['repo-owner'],
-			'repo_name' => $options['repo-name'],
-			'commit_id' => $commit_id,
-			'filter' => $filter,
-		)
+			'repo_name'  => $options['repo-name'],
+			'commit_id'  => $commit_id,
+			'filter'     => $filter,
+		]
 	);
 
 	if ( false !== $cached_data ) {
 		return $cached_data;
 	}
-
 
 	/*
 	 * Use local git repository
@@ -157,7 +147,6 @@ function vipgoci_gitrepo_fetch_tree(
 		$filter
 	);
 
-
 	/*
 	 * Cache the results and return
 	 */
@@ -168,7 +157,6 @@ function vipgoci_gitrepo_fetch_tree(
 
 	return $files_arr;
 }
-
 
 /*
  * Fetch from the local git-repository a particular file
@@ -184,22 +172,21 @@ function vipgoci_gitrepo_fetch_committed_file(
 	$file_name,
 	$local_git_repo
 ) {
-
 	vipgoci_gitrepo_ok(
-		$commit_id, $local_git_repo
+		$commit_id,
+		$local_git_repo
 	);
 
 	vipgoci_log(
 		'Fetching file-contents from local Git repository',
-		array(
-			'repo_owner'		=> $repo_owner,
-			'repo_name'		=> $repo_name,
-			'commit_id'		=> $commit_id,
-			'filename'		=> $file_name,
-			'local_git_repo'	=> $local_git_repo,
-		)
+		[
+			'repo_owner'     => $repo_owner,
+			'repo_name'      => $repo_name,
+			'commit_id'      => $commit_id,
+			'filename'       => $file_name,
+			'local_git_repo' => $local_git_repo,
+		]
 	);
-
 
 	/*
 	 * If everything seems fine, return the file.
@@ -216,7 +203,6 @@ function vipgoci_gitrepo_fetch_committed_file(
 	return $file_contents_tmp;
 }
 
-
 /*
  * Get 'git blame' log for a particular file,
  * using a local Git repository.
@@ -228,18 +214,19 @@ function vipgoci_gitrepo_blame_for_file(
 	$local_git_repo
 ) {
 	vipgoci_gitrepo_ok(
-		$commit_id, $local_git_repo
+		$commit_id,
+		$local_git_repo
 	);
 
 	vipgoci_runtime_measure( VIPGOCI_RUNTIME_START, 'git_repo_blame_for_file' );
 
 	vipgoci_log(
 		'Fetching \'git blame\' log from Git repository for file',
-		array(
-			'commmit_id' => $commit_id,
-			'file_name' => $file_name,
+		[
+			'commmit_id'     => $commit_id,
+			'file_name'      => $file_name,
 			'local_git_repo' => $local_git_repo,
-		)
+		]
 	);
 
 	/*
@@ -253,7 +240,6 @@ function vipgoci_gitrepo_blame_for_file(
 		escapeshellarg( $file_name )
 	);
 
-
 	/* Actually execute */
 	vipgoci_runtime_measure( VIPGOCI_RUNTIME_START, 'git_cli' );
 
@@ -266,18 +252,16 @@ function vipgoci_gitrepo_blame_for_file(
 	 * split each line into an array.
 	 */
 
-	$blame_log = array();
+	$blame_log = [];
 
 	$result = explode(
 		"\n",
 		$result
 	);
 
-	$current_commit = array(
-	);
+	$current_commit = [];
 
 	foreach ( $result as $result_line ) {
-
 		/*
 		 * First split the line into an array
 		 */
@@ -286,7 +270,6 @@ function vipgoci_gitrepo_blame_for_file(
 			' ',
 			$result_line
 		);
-
 
 		/*
 		 * Try to figure out if the line is contains
@@ -297,28 +280,22 @@ function vipgoci_gitrepo_blame_for_file(
 		 * and if so, store them.
 		 */
 
-		if (
-			( count( $result_line_arr ) >= 3 ) &&
-			( strlen( $result_line_arr[0] ) === 40 ) &&
-			( ctype_xdigit( $result_line_arr[0] ) === true )
-		) {
-			$current_commit = array(
-				'commit_id'	=> $result_line_arr[0],
-				'number'	=> $result_line_arr[1],
-			);
-		}
-
-		/*
+		if ( ( count( $result_line_arr ) >= 3 )
+		     && ( strlen( $result_line_arr[0] ) === 40 )
+		     && ( ctype_xdigit( $result_line_arr[0] ) === true ) ) {
+			$current_commit = [
+				'commit_id' => $result_line_arr[0],
+				'number'    => $result_line_arr[1],
+			];
+		} /*
 		 * Test if the first string on the line is 'filename',
 		 * and if so, store the filename it self. Do so using
 		 * a method that will save spaces and so forth in the
 		 * filename.
 		 */
 
-		else if (
-			( count( $result_line_arr ) >= 2 ) &&
-			( 'filename' === $result_line_arr[0] )
-		) {
+		elseif ( ( count( $result_line_arr ) >= 2 )
+		         && ( 'filename' === $result_line_arr[0] ) ) {
 			$tmp_file_arr = $result_line_arr;
 			unset( $tmp_file_arr[0] );
 
@@ -327,24 +304,21 @@ function vipgoci_gitrepo_blame_for_file(
 			unset( $tmp_file_arr );
 		}
 
-
 		/*
 		 * If we have got commit-ID, line-number
 		 * and filename, we can construct a return array
 		 */
 
-		if (
-			( ! empty( $current_commit['commit_id'] ) ) &&
-			( ! empty( $current_commit['number'] ) ) &&
-			( ! empty( $current_commit['filename'] ) )
-		) {
-			$blame_log[] = array(
+		if ( ( ! empty( $current_commit['commit_id'] ) )
+		     && ( ! empty( $current_commit['number'] ) )
+		     && ( ! empty( $current_commit['filename'] ) ) ) {
+			$blame_log[] = [
 				'commit_id' => $current_commit['commit_id'],
 				'file_name' => $current_commit['filename'],
-				'line_no' => (int) $current_commit['number'],
-			);
+				'line_no'   => (int) $current_commit['number'],
+			];
 
-			$current_commit = array();
+			$current_commit = [];
 		}
 	}
 
@@ -376,12 +350,12 @@ function vipgoci_gitrepo_get_file_at_commit(
 
 	vipgoci_log(
 		'Fetching contents of a particular file from the local git repository',
-		array(
-			'commmit_id'			=> $commit_id,
-			'file_name'			=> $file_name,
-			'local_git_repo'		=> $local_git_repo,
-			'local_git_repo_head_commit_id'	=> $local_git_repo_head_commit_id,
-		)
+		[
+			'commmit_id'                    => $commit_id,
+			'file_name'                     => $file_name,
+			'local_git_repo'                => $local_git_repo,
+			'local_git_repo_head_commit_id' => $local_git_repo_head_commit_id,
+		]
 	);
 
 	/*
@@ -410,11 +384,11 @@ function vipgoci_gitrepo_get_file_at_commit(
 	 * this revision, return null.
 	 */
 	if ( strpos(
-		$result,
-		'fatal: Path '
-	) === 0 ) {
+		     $result,
+		     'fatal: Path '
+	     ) === 0 ) {
 		return null;
 	}
 
 	return $result;
-} 
+}

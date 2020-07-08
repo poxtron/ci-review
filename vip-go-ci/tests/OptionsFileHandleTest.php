@@ -9,8 +9,7 @@ final class VipgociOptionsFileHandleTest extends TestCase {
 	 * @covers ::vipgoci_option_file_handle
 	 */
 	public function testOptionsFileHandle1() {
-		$options = array(
-		);
+		$options = [];
 
 		$temp_file_name = vipgoci_save_temp_file(
 			'my-test-file',

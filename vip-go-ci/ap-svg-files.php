@@ -12,21 +12,19 @@
  */
 
 function vipgoci_ap_svg_files(
-		$options,
-		&$auto_approved_files_arr
-	) {
-
+	$options,
+	&$auto_approved_files_arr
+) {
 	vipgoci_runtime_measure( VIPGOCI_RUNTIME_START, 'ap_svg_files' );
 
 	vipgoci_log(
 		'Doing auto-approval scanning for SVG files',
-		array(
-			'repo_owner'	=> $options['repo-owner'],
-			'repo_name'	=> $options['repo-name'],
-			'commit_id'	=> $options['commit'],
-		)
+		[
+			'repo_owner' => $options['repo-owner'],
+			'repo_name'  => $options['repo-name'],
+			'commit_id'  => $options['commit'],
+		]
 	);
-
 
 	$prs_implicated = vipgoci_github_prs_implicated(
 		$options['repo-owner'],
@@ -35,7 +33,6 @@ function vipgoci_ap_svg_files(
 		$options['token'],
 		$options['branches-ignore']
 	);
-
 
 	foreach ( $prs_implicated as $pr_item ) {
 		$pr_diff = vipgoci_github_diffs_fetch(
@@ -49,9 +46,8 @@ function vipgoci_ap_svg_files(
 			true // include permission changes
 		);
 
-
-		foreach ( $pr_diff as
-			$pr_diff_file_name => $pr_diff_contents
+		foreach (
+			$pr_diff as $pr_diff_file_name => $pr_diff_contents
 		) {
 			$pr_diff_file_extension = vipgoci_file_extension_get(
 				$pr_diff_file_name
@@ -61,10 +57,7 @@ function vipgoci_ap_svg_files(
 			 * If not a SVG file, do not do anything.
 			 */
 
-			if (
-				'svg' !==
-				$pr_diff_file_extension
-			) {
+			if ( 'svg' !== $pr_diff_file_extension ) {
 				continue;
 			}
 
@@ -73,9 +66,7 @@ function vipgoci_ap_svg_files(
 			 * of approved files, do not do anything.
 			 */
 			if ( isset(
-				$auto_approved_files_arr[
-					$pr_diff_file_name
-				]
+				$auto_approved_files_arr[ $pr_diff_file_name ]
 			) ) {
 				continue;
 			}
@@ -88,19 +79,14 @@ function vipgoci_ap_svg_files(
 			 */
 			if ( null === $pr_diff_contents ) {
 				vipgoci_log(
-					'Adding SVG file to list of approved ' .
-						'files, as no material changes ' .
-						'were being done, only renaming, ' .
-						'permission changes, or removal. ',
-					array(
-						'file_name' =>
-							$pr_diff_file_name,
-					)
+					'Adding SVG file to list of approved ' . 'files, as no material changes ' . 'were being done, only renaming, '
+					. 'permission changes, or removal. ',
+					[
+						'file_name' => $pr_diff_file_name,
+					]
 				);
 
-				$auto_approved_files_arr[
-					$pr_diff_file_name
-				] = 'ap-svg-files';
+				$auto_approved_files_arr[ $pr_diff_file_name ] = 'ap-svg-files';
 			}
 
 			/*
@@ -112,80 +98,51 @@ function vipgoci_ap_svg_files(
 				$pr_diff_file_name
 			);
 
-			$file_issues_arr_master =
-				$tmp_scan_results['file_issues_arr_master'];
+			$file_issues_arr_master
+				= $tmp_scan_results['file_issues_arr_master'];
 
 			/*
 			 * Check for failure
 			 */
-			if (
-				( ! isset(
+			if ( ( ! isset(
 					$file_issues_arr_master['totals']
 				) )
-				||
-				( ! isset(
+			     || ( ! isset(
 					$file_issues_arr_master['totals']['errors']
 				) )
-				||
-				( ! isset(
+			     || ( ! isset(
 					$file_issues_arr_master['totals']['warnings']
-				) )
-			) {
+				) ) ) {
 				vipgoci_log(
-					'Not adding SVG file to list of ' .
-						'approved files as a failure occurred',
+					'Not adding SVG file to list of ' . 'approved files as a failure occurred',
 
-					array(
-						'file_name' =>
-							$pr_diff_file_name,
-						'file_issues_arr_master' =>
-							$file_issues_arr_master,
-					),
+					[
+						'file_name'              => $pr_diff_file_name,
+						'file_issues_arr_master' => $file_issues_arr_master,
+					],
 					0,
 					true // log to IRC
 				);
-			}
-
-
-			/*
+			} /*
 			 * If no issues were found, we
 			 * can approve this file.
-			 */
-			else if (
-				( 0 ===
-					$file_issues_arr_master['totals']['errors']
-				)
-				&&
-				( 0 ===
-					$file_issues_arr_master['totals']['warnings']
-				)
-			) {
+			 */ elseif ( ( 0 === $file_issues_arr_master['totals']['errors'] )
+			             && ( 0 === $file_issues_arr_master['totals']['warnings'] ) ) {
 				vipgoci_log(
-					'Adding SVG file to list of approved ' .
-						'files, as no PHPCS-issues ' .
-						'were found',
-					array(
-						'file_name' =>
-							$pr_diff_file_name,
-					)
+					'Adding SVG file to list of approved ' . 'files, as no PHPCS-issues ' . 'were found',
+					[
+						'file_name' => $pr_diff_file_name,
+					]
 				);
 
-				$auto_approved_files_arr[
-					$pr_diff_file_name
-				] = 'ap-svg-files';
-			}
-
-			else {
+				$auto_approved_files_arr[ $pr_diff_file_name ] = 'ap-svg-files';
+			} else {
 				vipgoci_log(
-					'Not adding SVG file to list of ' .
-						'approved files as issues ' .
-						'were found',
-					array(
-						'file_name' =>
-							$pr_diff_file_name,
-						'file_issues_arr_master' =>
-							$file_issues_arr_master,
-					)
+					'Not adding SVG file to list of ' . 'approved files as issues ' . 'were found',
+					[
+						'file_name'              => $pr_diff_file_name,
+						'file_issues_arr_master' => $file_issues_arr_master,
+					]
 				);
 			}
 		}

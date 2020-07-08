@@ -5,19 +5,20 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class GitHubTeamMembersTest extends TestCase {
-	var $options = array(
-		'github-token'	=> null,
-		'team-id' => null,
-	);
+	var $options
+		= [
+			'github-token' => null,
+			'team-id'      => null,
+		];
 
 	public function setUp() {
-		foreach( $this->options as $option_key => $option_value ) {
-			$this->options[ $option_key ] =
-				vipgoci_unittests_get_config_value(
-					'git-secrets',
-					$option_key,
-					true
-				);
+		foreach ( $this->options as $option_key => $option_value ) {
+			$this->options[ $option_key ]
+				= vipgoci_unittests_get_config_value(
+				'git-secrets',
+				$option_key,
+				true
+			);
 		}
 	}
 
@@ -31,11 +32,11 @@ final class GitHubTeamMembersTest extends TestCase {
 	public function testTeamMembers_ids_only_false() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array( ),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -46,7 +47,6 @@ final class GitHubTeamMembersTest extends TestCase {
 
 			return;
 		}
-
 
 		/*
 		 * Test with ids_only = false
@@ -79,7 +79,6 @@ final class GitHubTeamMembersTest extends TestCase {
 			) > 0
 		);
 
-
 		/*
 		 * Test again to make sure the cache behaves correctly.
 		 */
@@ -106,14 +105,14 @@ final class GitHubTeamMembersTest extends TestCase {
 	/**
 	 * @covers ::vipgoci_github_team_members_get
 	 */
-	public function testTeamMembers_ids_only_true() {	
+	public function testTeamMembers_ids_only_true() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array( ),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 

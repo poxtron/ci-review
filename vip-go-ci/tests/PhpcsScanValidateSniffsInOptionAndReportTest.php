@@ -5,97 +5,26 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class PhpcsScanValidateSniffsInOptionAndReportTest extends TestCase {
-	var $options_phpcs = array(
-		'phpcs-path'
-			=> null,
+	var $options_phpcs
+		= [
+			'phpcs-path' => null,
 
-		'phpcs-standard'
-			=> null,
+			'phpcs-standard' => null,
 
-		'phpcs-validate-sniffs-and-report-commit'
-			=> null,
+			'phpcs-validate-sniffs-and-report-commit' => null,
 
-		'phpcs-validate-sniffs-and-report-exclude-invalid'
-			=> null,
+			'phpcs-validate-sniffs-and-report-exclude-invalid' => null,
 
-		'phpcs-validate-sniffs-and-report-exclude-valid'
-			=> null,
-	);
+			'phpcs-validate-sniffs-and-report-exclude-valid' => null,
+		];
 
-	var $options_git = array(
-		'repo-owner'	=> null,
-		'repo-name'	=> null,
-	);
+	var $options_git
+		= [
+			'repo-owner' => null,
+			'repo-name'  => null,
+		];
 
 	var $current_user_info = null;
-
-	protected function setUp() {
-		vipgoci_unittests_get_config_values(
-			'phpcs-scan',
-			$this->options_phpcs
-		);
-
-		vipgoci_unittests_get_config_values(
-			'git',
-			$this->options_git
-		);
-
-		$this->options = array_merge(
-			$this->options_phpcs,
-			$this->options_git
-		);
-
-		$this->options[ 'github-token' ] =
-			vipgoci_unittests_get_config_value(
-				'git-secrets',
-				'github-token',
-				true // Fetch from secrets file
-			);
-
-		$this->options['token'] =
-			$this->options['github-token'];
-
-		$this->options['branches-ignore'] = array();
-
-		foreach(
-			array(
-				'phpcs-validate-sniffs-and-report-exclude-valid',
-				'phpcs-validate-sniffs-and-report-exclude-invalid'
-			) as $array_key
-		) {
-			$this->options[ $array_key ] = explode(
-				',',
-				$this->options[ $array_key ]
-			);
-		}
-
-		$this->options['phpcs-validate-sniffs-and-report-exclude-valid-and-invalid'] = array_merge(
-			$this->options['phpcs-validate-sniffs-and-report-exclude-valid'],
-			$this->options['phpcs-validate-sniffs-and-report-exclude-invalid']
-		);
-	
-		/*
-		 * Get info about token holder.
-		 */
-		if (
-			( empty( $this->current_user_info ) ) &&
-			( ! empty( $this->options['github-token'] ) )
-		) {
-			vipgoci_unittests_output_suppress();
-
-			$this->current_user_info = vipgoci_github_authenticated_user_get(
-				$this->options['github-token']
-			);
-
-			vipgoci_unittests_output_unsuppress();
-		}
-	}
-
-	protected function tearDown() {
-		$this->options_phpcs = null;
-		$this->options_git = null;
-		$this->options = null;
-	}
 
 	/**
 	 * @covers ::vipgoci_phpcs_validate_sniffs_in_options_and_report
@@ -103,19 +32,17 @@ final class PhpcsScanValidateSniffsInOptionAndReportTest extends TestCase {
 	public function testPhpcsValidateSniffsWithErrors() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array(),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
-		$this->options['commit'] =
-			$this->options['phpcs-validate-sniffs-and-report-commit'];
+		$this->options['commit'] = $this->options['phpcs-validate-sniffs-and-report-commit'];
 
-		$this->options['phpcs-sniffs-exclude'] =
-			$this->options['phpcs-validate-sniffs-and-report-exclude-valid-and-invalid'];
+		$this->options['phpcs-sniffs-exclude'] = $this->options['phpcs-validate-sniffs-and-report-exclude-valid-and-invalid'];
 
 		/*
 		 * Begin with getting PRs implicated,
@@ -142,7 +69,7 @@ final class PhpcsScanValidateSniffsInOptionAndReportTest extends TestCase {
 		 * For each Pull-Request, check
 		 * that it has no comments.
 		 */
-		foreach( $prs_implicated as $pr_item ) {
+		foreach ( $prs_implicated as $pr_item ) {
 			$pr_comments = $this->_getPrGenericComments(
 				$pr_item->number
 			);
@@ -178,7 +105,7 @@ final class PhpcsScanValidateSniffsInOptionAndReportTest extends TestCase {
 			count( $prs_implicated )
 		);
 
-		foreach( $prs_implicated as $pr_item ) {
+		foreach ( $prs_implicated as $pr_item ) {
 			$pr_comments = $this->_getPrGenericComments(
 				$pr_item->number
 			);
@@ -198,20 +125,19 @@ final class PhpcsScanValidateSniffsInOptionAndReportTest extends TestCase {
 
 				// Check if the comment is about invalid sniffs
 				if ( strpos(
-					$pr_comment->body,
-					VIPGOCI_PHPCS_INVALID_SNIFFS
-				) !== 0 ) {
+					     $pr_comment->body,
+					     VIPGOCI_PHPCS_INVALID_SNIFFS
+				     ) !== 0 ) {
 					continue;
 				}
 
 				// Check if at least one invalid sniff-name is found in the comment
 				if ( strpos(
-					$pr_comment->body,
-					$this->options['phpcs-validate-sniffs-and-report-exclude-invalid'][0]
-				) === false ) {
+					     $pr_comment->body,
+					     $this->options['phpcs-validate-sniffs-and-report-exclude-invalid'][0]
+				     ) === false ) {
 					continue;
 				}
-
 
 				vipgoci_unittests_output_suppress();
 
@@ -225,7 +151,7 @@ final class PhpcsScanValidateSniffsInOptionAndReportTest extends TestCase {
 
 				vipgoci_unittests_output_unsuppress();
 
-				$removed_comments++;
+				$removed_comments ++;
 			}
 
 			// Make sure we removed one comment
@@ -241,25 +167,54 @@ final class PhpcsScanValidateSniffsInOptionAndReportTest extends TestCase {
 		);
 	}
 
+	protected function _getPrGenericComments(
+		$pr_number
+	) {
+		$pr_comments_ret = [];
+
+		$page     = 1;
+		$per_page = 100;
+
+		do {
+			$github_url = VIPGOCI_GITHUB_BASE_URL . '/' . 'repos/' . rawurlencode( $this->options['repo-owner'] ) . '/' . rawurlencode(
+					$this->options['repo-name']
+				) . '/' . 'issues/' . rawurlencode( $pr_number ) . '/' . 'comments' . '?page=' . rawurlencode( $page ) . '&' . 'per_page='
+			              . rawurlencode( $per_page );
+
+			$pr_comments_raw = json_decode(
+				vipgoci_github_fetch_url(
+					$github_url,
+					$this->options['github-token']
+				)
+			);
+
+			foreach ( $pr_comments_raw as $pr_comment ) {
+				$pr_comments_ret[] = $pr_comment;
+			}
+
+			$page ++;
+		} while ( count( $pr_comments_raw ) >= $per_page );
+
+		return $pr_comments_ret;
+	}
+
 	/**
 	 * @covers ::vipgoci_phpcs_validate_sniffs_in_options_and_report
 	 */
 	public function testPhpcsValidateSniffsNoErrors() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array(),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
-		$this->options['commit'] =
-			$this->options['phpcs-validate-sniffs-and-report-commit'];
+		$this->options['commit'] = $this->options['phpcs-validate-sniffs-and-report-commit'];
 
-		$this->options['phpcs-sniffs-exclude'] =
-			$this->options['phpcs-validate-sniffs-and-report-exclude-valid'];
+		$this->options['phpcs-sniffs-exclude'] = $this->options['phpcs-validate-sniffs-and-report-exclude-valid'];
 
 		/*
 		 * Begin with getting PRs implicated,
@@ -286,7 +241,7 @@ final class PhpcsScanValidateSniffsInOptionAndReportTest extends TestCase {
 		 * For each Pull-Request, check
 		 * that it has no comments.
 		 */
-		foreach( $prs_implicated as $pr_item ) {
+		foreach ( $prs_implicated as $pr_item ) {
 			$pr_comments = $this->_getPrGenericComments(
 				$pr_item->number
 			);
@@ -321,7 +276,7 @@ final class PhpcsScanValidateSniffsInOptionAndReportTest extends TestCase {
 			count( $prs_implicated )
 		);
 
-		foreach( $prs_implicated as $pr_item ) {
+		foreach ( $prs_implicated as $pr_item ) {
 			$pr_comments = $this->_getPrGenericComments(
 				$pr_item->number
 			);
@@ -338,45 +293,71 @@ final class PhpcsScanValidateSniffsInOptionAndReportTest extends TestCase {
 		);
 	}
 
+	protected function setUp() {
+		vipgoci_unittests_get_config_values(
+			'phpcs-scan',
+			$this->options_phpcs
+		);
+
+		vipgoci_unittests_get_config_values(
+			'git',
+			$this->options_git
+		);
+
+		$this->options = array_merge(
+			$this->options_phpcs,
+			$this->options_git
+		);
+
+		$this->options['github-token'] = vipgoci_unittests_get_config_value(
+			'git-secrets',
+			'github-token',
+			true // Fetch from secrets file
+		);
+
+		$this->options['token'] = $this->options['github-token'];
+
+		$this->options['branches-ignore'] = [];
+
+		foreach (
+			[
+				'phpcs-validate-sniffs-and-report-exclude-valid',
+				'phpcs-validate-sniffs-and-report-exclude-invalid'
+			] as $array_key
+		) {
+			$this->options[ $array_key ] = explode(
+				',',
+				$this->options[ $array_key ]
+			);
+		}
+
+		$this->options['phpcs-validate-sniffs-and-report-exclude-valid-and-invalid'] = array_merge(
+			$this->options['phpcs-validate-sniffs-and-report-exclude-valid'],
+			$this->options['phpcs-validate-sniffs-and-report-exclude-invalid']
+		);
+
+		/*
+		 * Get info about token holder.
+		 */
+		if ( ( empty( $this->current_user_info ) ) && ( ! empty( $this->options['github-token'] ) ) ) {
+			vipgoci_unittests_output_suppress();
+
+			$this->current_user_info = vipgoci_github_authenticated_user_get(
+				$this->options['github-token']
+			);
+
+			vipgoci_unittests_output_unsuppress();
+		}
+	}
+
 	/*
 	 * Get generic comments made to a Pull-Request
 	 * from GitHub, uncached.
 	 */
-	protected function _getPrGenericComments(
-		$pr_number
-	) {
-		$pr_comments_ret = array();
 
-		$page = 1;
-		$per_page = 100;
-
-		do {
-			$github_url =
-				VIPGOCI_GITHUB_BASE_URL . '/' .
-				'repos/' .
-				rawurlencode( $this->options['repo-owner'] ) . '/' .
-				rawurlencode( $this->options['repo-name'] ) . '/' .
-				'issues/' .
-				rawurlencode( $pr_number ) . '/' .
-				'comments' .
-				'?page=' . rawurlencode( $page ) . '&' .
-				'per_page=' . rawurlencode( $per_page );
-
-
-	                $pr_comments_raw = json_decode(
-	                        vipgoci_github_fetch_url(
-        	                        $github_url,
-                	                $this->options['github-token']
-                        	)
-	                );
-
-	                foreach ( $pr_comments_raw as $pr_comment ) {
-	                        $pr_comments_ret[] = $pr_comment;
-        	        }
-
-	                $page++;
-		} while ( count( $pr_comments_raw ) >= $per_page );
-
-		return $pr_comments_ret;
+	protected function tearDown() {
+		$this->options_phpcs = null;
+		$this->options_git   = null;
+		$this->options       = null;
 	}
 }

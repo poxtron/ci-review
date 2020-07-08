@@ -5,31 +5,17 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class SupportLevelLabelMetaApiDataFetchTest extends TestCase {
-	var $options_meta_api_secrets = array(
-		'repo-meta-api-base-url'	=> null,
-		'repo-meta-api-user-id'		=> null,
-		'repo-meta-api-access-token'	=> null,
+	var $options_meta_api_secrets
+		= [
+			'repo-meta-api-base-url'     => null,
+			'repo-meta-api-user-id'      => null,
+			'repo-meta-api-access-token' => null,
 
-		'repo-owner'			=> null,
-		'repo-name'			=> null,
+			'repo-owner' => null,
+			'repo-name'  => null,
 
-		'support-tier-name'		=> null,
-	);
-
-	protected function setUp() {
-		vipgoci_unittests_get_config_values(
-			'repo-meta-api-secrets',
-			$this->options_meta_api_secrets,
-			true
-		);
-
-		$this->options = $this->options_meta_api_secrets;
-	}
-
-	protected function tearDown() {
-		$this->options_meta_api_secrets = null;
-		$this->options = null;
-	}
+			'support-tier-name' => null,
+		];
 
 	/**
 	 * @covers ::vipgoci_repo_meta_api_data_fetch
@@ -37,11 +23,11 @@ final class SupportLevelLabelMetaApiDataFetchTest extends TestCase {
 	public function testMetaApiDataFetch() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array( 'repo-meta-api-user-id', 'repo-meta-api-access-token' ),
+			[ 'repo-meta-api-user-id', 'repo-meta-api-access-token' ],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -61,7 +47,7 @@ final class SupportLevelLabelMetaApiDataFetchTest extends TestCase {
 
 		$this->assertTrue(
 			( ! empty(
-				$repo_meta_data['data'][0]['support_tier']
+			$repo_meta_data['data'][0]['support_tier']
 			) )
 		);
 
@@ -85,5 +71,20 @@ final class SupportLevelLabelMetaApiDataFetchTest extends TestCase {
 			$repo_meta_data,
 			$repo_meta_data_2
 		);
+	}
+
+	protected function setUp() {
+		vipgoci_unittests_get_config_values(
+			'repo-meta-api-secrets',
+			$this->options_meta_api_secrets,
+			true
+		);
+
+		$this->options = $this->options_meta_api_secrets;
+	}
+
+	protected function tearDown() {
+		$this->options_meta_api_secrets = null;
+		$this->options                  = null;
 	}
 }

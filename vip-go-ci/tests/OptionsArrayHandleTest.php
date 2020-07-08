@@ -9,21 +9,20 @@ final class VipgociOptionsArrayHandleTest extends TestCase {
 	 * @covers ::vipgoci_option_array_handle
 	 */
 	public function testOptionsArrayHandle1() {
-		$options = array(
-		);
+		$options = [];
 
 		vipgoci_option_array_handle(
 			$options,
 			'mytestoption',
-			array( 'myvalue' ),
+			[ 'myvalue' ],
 			null,
 			','
 		);
 
 		$this->assertEquals(
-			array(
+			[
 				'myvalue',
-			),
+			],
 			$options['mytestoption']
 		);
 	}
@@ -32,9 +31,9 @@ final class VipgociOptionsArrayHandleTest extends TestCase {
 	 * @covers ::vipgoci_option_array_handle
 	 */
 	public function testOptionsArrayHandle2() {
-		$options = array(
+		$options = [
 			'mytestoption' => 'myvalue1,myvalue2,myvalue3',
-		);
+		];
 
 		vipgoci_option_array_handle(
 			$options,
@@ -45,11 +44,11 @@ final class VipgociOptionsArrayHandleTest extends TestCase {
 		);
 
 		$this->assertEquals(
-			array(
+			[
 				'myvalue1',
 				'myvalue2',
 				'myvalue3',
-			),
+			],
 			$options['mytestoption']
 		);
 	}
@@ -58,9 +57,9 @@ final class VipgociOptionsArrayHandleTest extends TestCase {
 	 * @covers ::vipgoci_option_array_handle
 	 */
 	public function testOptionsArrayHandle3() {
-		$options = array(
+		$options = [
 			'mytestoption' => 'myvalue1,myvalue2,MYVALUE3',
-		);
+		];
 
 		vipgoci_option_array_handle(
 			$options,
@@ -71,11 +70,11 @@ final class VipgociOptionsArrayHandleTest extends TestCase {
 		);
 
 		$this->assertEquals(
-			array(
+			[
 				'myvalue1',
 				'myvalue2',
 				'myvalue3', // should be transformed to lower-case by default
-			),
+			],
 			$options['mytestoption']
 		);
 	}
@@ -84,9 +83,9 @@ final class VipgociOptionsArrayHandleTest extends TestCase {
 	 * @covers ::vipgoci_option_array_handle
 	 */
 	public function testOptionsArrayHandle4() {
-		$options = array(
+		$options = [
 			'mytestoption' => 'myvalue1,myvalue2,MYVALUE3',
-		);
+		];
 
 		vipgoci_option_array_handle(
 			$options,
@@ -98,11 +97,11 @@ final class VipgociOptionsArrayHandleTest extends TestCase {
 		);
 
 		$this->assertEquals(
-			array(
+			[
 				'myvalue1',
 				'myvalue2',
 				'MYVALUE3',
-			),
+			],
 			$options['mytestoption']
 		);
 	}

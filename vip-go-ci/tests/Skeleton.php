@@ -8,6 +8,6 @@ final class extends TestCase {
 	/**
 	 * @covers ::
 	 */
-	public function test () {
+	public function test() {
 	}
 }

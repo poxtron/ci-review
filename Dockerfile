@@ -1,4 +1,4 @@
-FROM elegantthemes/php:7.4.5
+FROM elegantthemes/php:7.2.13
 
 LABEL "com.github.actions.icon"="check-circle"
 LABEL "com.github.actions.color"="orange"
@@ -25,7 +25,6 @@ RUN chmod +x /usr/local/bin/*.sh /usr/local/bin/run-review.php
 
 # copy modified version of vip-go-ci
 RUN mkdir -p /home/etstaging/vip-go-ci
-#WORKDIR /home/etstaging/vip-go-ci
 ADD vip-go-ci /home/etstaging/vip-go-ci
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

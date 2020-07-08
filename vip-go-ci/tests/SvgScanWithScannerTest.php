@@ -7,21 +7,6 @@ use PHPUnit\Framework\TestCase;
 final class SvgScanWithScannerTest extends TestCase {
 	var $svg_scanner_path = null;
 
-	protected function setUp() {
-		$this->svg_scanner_path = vipgoci_unittests_get_config_value(
-			'svg-scan',
-			'svg-scanner-path'
-		);
-
-		if ( ! file_exists( $this->svg_scanner_path ) ) {
-			$this->svg_scanner_path = null;
-		}
-	}
-
-	protected function tearDown() {
-		$this->svg_scanner_path = null;
-	}
-
 	/**
 	 * @covers ::vipgoci_svg_do_scan_with_scanner
 	 */
@@ -67,7 +52,8 @@ final class SvgScanWithScannerTest extends TestCase {
 		);
 
 		$scanner_results_expected = json_decode(
-			'{"totals":{"errors":4,"warnings":0,"fixable":0},"files":{"' . addcslashes( $temp_file_name, '/' ) . '":{"errors":4,"messages":[{"message":"Suspicious attribute \'href\'","line":8},{"message":"Suspicious attribute \'href\'","line":7},{"message":"Suspicious attribute \'href\'","line":3},{"message":"Suspicious attribute \'href\'","line":2}]}}}',
+			'{"totals":{"errors":4,"warnings":0,"fixable":0},"files":{"' . addcslashes( $temp_file_name, '/' )
+			. '":{"errors":4,"messages":[{"message":"Suspicious attribute \'href\'","line":8},{"message":"Suspicious attribute \'href\'","line":7},{"message":"Suspicious attribute \'href\'","line":3},{"message":"Suspicious attribute \'href\'","line":2}]}}}',
 			true
 		);
 
@@ -80,7 +66,6 @@ final class SvgScanWithScannerTest extends TestCase {
 			$scanner_results
 		);
 	}
-
 
 	/**
 	 * @covers ::vipgoci_svg_do_scan_with_scanner
@@ -127,10 +112,10 @@ final class SvgScanWithScannerTest extends TestCase {
 		vipgoci_unittests_output_unsuppress();
 
 		$scanner_results_expected = json_decode(
-			'{"totals":{"errors":0,"warnings":0,"fixable":0},"files":{"' . addcslashes( $temp_file_name, '/' ) . '":{"errors":0,"messages":[]}}}',
+			'{"totals":{"errors":0,"warnings":0,"fixable":0},"files":{"' . addcslashes( $temp_file_name, '/' )
+			. '":{"errors":0,"messages":[]}}}',
 			true
 		);
-
 
 		unlink(
 			$temp_file_name
@@ -140,5 +125,20 @@ final class SvgScanWithScannerTest extends TestCase {
 			$scanner_results_expected,
 			$scanner_results
 		);
+	}
+
+	protected function setUp() {
+		$this->svg_scanner_path = vipgoci_unittests_get_config_value(
+			'svg-scan',
+			'svg-scanner-path'
+		);
+
+		if ( ! file_exists( $this->svg_scanner_path ) ) {
+			$this->svg_scanner_path = null;
+		}
+	}
+
+	protected function tearDown() {
+		$this->svg_scanner_path = null;
 	}
 }

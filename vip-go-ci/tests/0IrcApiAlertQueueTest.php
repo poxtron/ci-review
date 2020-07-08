@@ -23,10 +23,10 @@ final class IrcApiAlertQueueTest extends TestCase {
 		);
 
 		$this->assertEquals(
-			array(
+			[
 				'mymessage1',
 				'mymessage2',
-			),
+			],
 			$queue
 		);
 	}

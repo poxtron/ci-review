@@ -9,8 +9,7 @@ final class VipgociOptionsIntegerHandleTest extends TestCase {
 	 * @covers ::vipgoci_option_integer_handle
 	 */
 	public function testOptionsIntegerHandle1() {
-		$options = array(
-		);
+		$options = [];
 
 		vipgoci_option_integer_handle(
 			$options,
@@ -19,9 +18,9 @@ final class VipgociOptionsIntegerHandleTest extends TestCase {
 		);
 
 		$this->assertEquals(
-			array(
-				'mytestoption'	=> 5
-			),
+			[
+				'mytestoption' => 5
+			],
 			$options
 		);
 	}

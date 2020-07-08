@@ -5,27 +5,12 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class PhpcsScanGetSniffsForStandard extends TestCase {
-	var $options_phpcs = array(
-		'phpcs-path'		=> null,
-		'phpcs-standard'	=> null,
-		'phpcs-sniffs-existing'	=> null,
-	);
-
-	protected function setUp() {
-		vipgoci_unittests_get_config_values(
-			'phpcs-scan',
-			$this->options_phpcs
-		);
-
-		$this->options_phpcs['phpcs-sniffs-existing'] = explode(
-			',',
-			$this->options_phpcs['phpcs-sniffs-existing']
-		);
-	}
-
-	protected function tearDown() {
-		$this->options_phpcs = null;
-	}
+	var $options_phpcs
+		= [
+			'phpcs-path'            => null,
+			'phpcs-standard'        => null,
+			'phpcs-sniffs-existing' => null,
+		];
 
 	/**
 	 * @covers ::vipgoci_phpcs_get_sniffs_for_standard
@@ -33,11 +18,11 @@ final class PhpcsScanGetSniffsForStandard extends TestCase {
 	public function testDoScanTest1() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options_phpcs,
-			array( ),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -58,9 +43,8 @@ final class PhpcsScanGetSniffsForStandard extends TestCase {
 			$phpcs_sniffs
 		);
 
-		foreach(
-			$this->options_phpcs['phpcs-sniffs-existing']
-				as $sniff_name
+		foreach (
+			$this->options_phpcs['phpcs-sniffs-existing'] as $sniff_name
 		) {
 			$this->assertNotFalse(
 				in_array(
@@ -70,5 +54,21 @@ final class PhpcsScanGetSniffsForStandard extends TestCase {
 				)
 			);
 		}
+	}
+
+	protected function setUp() {
+		vipgoci_unittests_get_config_values(
+			'phpcs-scan',
+			$this->options_phpcs
+		);
+
+		$this->options_phpcs['phpcs-sniffs-existing'] = explode(
+			',',
+			$this->options_phpcs['phpcs-sniffs-existing']
+		);
+	}
+
+	protected function tearDown() {
+		$this->options_phpcs = null;
 	}
 }

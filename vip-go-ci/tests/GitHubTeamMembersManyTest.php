@@ -5,20 +5,21 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class GitHubTeamMembersManyTest extends TestCase {
-	var $options = array(
-		'github-token'	=> null,
-		'team-id'	=> null,
-		'team-slug'	=> null,
-	);
+	var $options
+		= [
+			'github-token' => null,
+			'team-id'      => null,
+			'team-slug'    => null,
+		];
 
 	public function setUp() {
-		foreach( $this->options as $option_key => $option_value ) {
-			$this->options[ $option_key ] =
-				vipgoci_unittests_get_config_value(
-					'git-secrets',
-					$option_key,
-					true
-				);
+		foreach ( $this->options as $option_key => $option_value ) {
+			$this->options[ $option_key ]
+				= vipgoci_unittests_get_config_value(
+				'git-secrets',
+				$option_key,
+				true
+			);
 		}
 	}
 
@@ -32,11 +33,11 @@ final class GitHubTeamMembersManyTest extends TestCase {
 	public function testTeamMembersMany1() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array( ),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -48,15 +49,14 @@ final class GitHubTeamMembersManyTest extends TestCase {
 			return;
 		}
 
-
 		vipgoci_unittests_output_suppress();
 
 		$team_members_res1_actual = vipgoci_github_team_members_many_get(
 			$this->options['github-token'],
-			array(
+			[
 				$this->options['team-id'],
 				$this->options['team-id'],
-			)
+			]
 		);
 
 		vipgoci_unittests_output_unsuppress();

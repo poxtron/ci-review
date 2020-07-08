@@ -40,19 +40,18 @@ final class GitHubApiCurlHeadersTest extends TestCase {
 			'Status: 200 OK'
 		);
 
-
 		$actual_results = vipgoci_curl_headers(
 			null,
 			null
 		);
 
 		$this->assertEquals(
-			array(
-				'content-type'	=> array( 'text/plain' ),
-				'date'		=> array( 'Mon, 04 Mar 2019 16:43:35 GMT' ),
-				'location'	=> array( 'https://www.ruv.is/' ),
-				'status'	=> array( 200, 'OK' ),
-			),
+			[
+				'content-type' => [ 'text/plain' ],
+				'date'         => [ 'Mon, 04 Mar 2019 16:43:35 GMT' ],
+				'location'     => [ 'https://www.ruv.is/' ],
+				'status'       => [ 200, 'OK' ],
+			],
 			$actual_results
 		);
 	}

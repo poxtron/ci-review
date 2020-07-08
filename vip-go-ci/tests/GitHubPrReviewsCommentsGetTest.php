@@ -5,47 +5,16 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class GitHubPrReviewsCommentsGet extends TestCase {
-	var $options_git_repo_tests = array(
-		'commit-test-github-pr-reviews-get-1'	=> null
-	);
+	var $options_git_repo_tests
+		= [
+			'commit-test-github-pr-reviews-get-1' => null
+		];
 
-	var $options_git = array(
-		'repo-owner'				=> null,
-		'repo-name'				=> null,
-	);
-
-	protected function setUp() {
-		vipgoci_unittests_get_config_values(
-			'git',
-			$this->options_git
-		);
-
-		vipgoci_unittests_get_config_values(
-			'git-repo-tests',
-			$this->options_git_repo_tests
-		);
-
-		$this->options = array_merge(
-			$this->options_git,
-			$this->options_git_repo_tests
-		);
-
-		$this->options[ 'github-token' ] =
-			vipgoci_unittests_get_config_value(
-				'git-secrets',
-				'github-token',
-				true // Fetch from secrets file
-			);
-
-		$this->options['token'] =
-			$this->options['github-token'];
-	}
-
-	protected function tearDown() {
-		$this->options_git_repo_tests = null;
-		$this->options_git = null;
-		$this->options = null;
-	}
+	var $options_git
+		= [
+			'repo-owner' => null,
+			'repo-name'  => null,
+		];
 
 	/**
 	 * @covers ::vipgoci_github_pr_reviews_comments_get
@@ -53,15 +22,15 @@ final class GitHubPrReviewsCommentsGet extends TestCase {
 	public function testGitHubPrReviewsCommentsGet1() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array( 'github-token', 'token' ),
+			[ 'github-token', 'token' ],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
-		$prs_comments = array();
+		$prs_comments = [];
 
 		vipgoci_unittests_output_suppress();
 
@@ -103,5 +72,38 @@ final class GitHubPrReviewsCommentsGet extends TestCase {
 			'All output should be escaped.',
 			$prs_comments['file1.php:3'][0]->body
 		);
+	}
+
+	protected function setUp() {
+		vipgoci_unittests_get_config_values(
+			'git',
+			$this->options_git
+		);
+
+		vipgoci_unittests_get_config_values(
+			'git-repo-tests',
+			$this->options_git_repo_tests
+		);
+
+		$this->options = array_merge(
+			$this->options_git,
+			$this->options_git_repo_tests
+		);
+
+		$this->options['github-token']
+			= vipgoci_unittests_get_config_value(
+			'git-secrets',
+			'github-token',
+			true // Fetch from secrets file
+		);
+
+		$this->options['token']
+			= $this->options['github-token'];
+	}
+
+	protected function tearDown() {
+		$this->options_git_repo_tests = null;
+		$this->options_git            = null;
+		$this->options                = null;
 	}
 }

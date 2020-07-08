@@ -30,30 +30,30 @@ final class SvgScanLookForSpecificTokensTest extends TestCase {
 			</svg>'
 		);
 
-		$results = array(
-			'totals'	=> array(
-				'errors'	=> 0,
-				'warnings'	=> 0,
-				'fixable'	=> 0,
-			),
-			'files'		=> array(),
-		);
+		$results = [
+			'totals' => [
+				'errors'   => 0,
+				'warnings' => 0,
+				'fixable'  => 0,
+			],
+			'files'  => [],
+		];
 
 		vipgoci_svg_look_for_specific_tokens(
-			array(
+			[
 				'<?php',
 				'<=',
 				'<foo ',
-			),
+			],
 			$temp_file_name,
 			$results
 		);
 
 		$results_expected = json_decode(
-			'{"totals":{"errors":1,"warnings":0,"fixable":0},"files":{"' . addcslashes( $temp_file_name, '/' ) . '":{"errors":1,"messages":[{"message":"Found forbidden tag in SVG file: \'<?php\'","line":6,"level":"ERROR"}]}}}',
+			'{"totals":{"errors":1,"warnings":0,"fixable":0},"files":{"' . addcslashes( $temp_file_name, '/' )
+			. '":{"errors":1,"messages":[{"message":"Found forbidden tag in SVG file: \'<?php\'","line":6,"level":"ERROR"}]}}}',
 			true
 		);
-
 
 		unlink(
 			$temp_file_name

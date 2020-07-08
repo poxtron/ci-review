@@ -8,15 +8,15 @@ final class OptionsSensitiveCleanTest extends TestCase {
 	/**
 	 * @covers ::vipgoci_options_sensitive_clean
 	 */
-	public function testSensitiveClean1 () {
-		$options = array(
-			'a1'	=> 'secret',
-			'b1'	=> 'notsecret',
-			'c1'	=> 'secret',
-			'd1'	=> 'secret',
-			'e1'	=> 'notsecret',
-			'f1'	=> 'notsecret',
-		);
+	public function testSensitiveClean1() {
+		$options = [
+			'a1' => 'secret',
+			'b1' => 'notsecret',
+			'c1' => 'secret',
+			'd1' => 'secret',
+			'e1' => 'notsecret',
+			'f1' => 'notsecret',
+		];
 
 		$options_clean = vipgoci_options_sensitive_clean(
 			$options
@@ -25,7 +25,7 @@ final class OptionsSensitiveCleanTest extends TestCase {
 		/*
 		 * No options have been registered for
 		 * cleaning, should remain unchanged.
-		 */		
+		 */
 
 		$this->assertEquals(
 			$options,
@@ -39,10 +39,10 @@ final class OptionsSensitiveCleanTest extends TestCase {
 		 */
 		vipgoci_options_sensitive_clean(
 			null,
-			array(
+			[
 				'a1',
 				'c1',
-			)
+			]
 		);
 
 		$options_clean = vipgoci_options_sensitive_clean(
@@ -50,14 +50,14 @@ final class OptionsSensitiveCleanTest extends TestCase {
 		);
 
 		$this->assertEquals(
-			array(
-				'a1'	=> '***',
-				'b1'	=> 'notsecret',
-				'c1'	=> '***',
-				'd1'	=> 'secret',
-				'e1'	=> 'notsecret',
-				'f1'	=> 'notsecret',
-			),
+			[
+				'a1' => '***',
+				'b1' => 'notsecret',
+				'c1' => '***',
+				'd1' => 'secret',
+				'e1' => 'notsecret',
+				'f1' => 'notsecret',
+			],
 			$options_clean
 		);
 
@@ -68,9 +68,9 @@ final class OptionsSensitiveCleanTest extends TestCase {
 
 		vipgoci_options_sensitive_clean(
 			null,
-			array(
+			[
 				'd1'
-			)
+			]
 		);
 
 		$options_clean = vipgoci_options_sensitive_clean(
@@ -78,14 +78,14 @@ final class OptionsSensitiveCleanTest extends TestCase {
 		);
 
 		$this->assertEquals(
-			array(
-				'a1'	=> '***',
-				'b1'	=> 'notsecret',
-				'c1'	=> '***',
-				'd1'	=> '***',
-				'e1'	=> 'notsecret',
-				'f1'	=> 'notsecret',
-			),
+			[
+				'a1' => '***',
+				'b1' => 'notsecret',
+				'c1' => '***',
+				'd1' => '***',
+				'e1' => 'notsecret',
+				'f1' => 'notsecret',
+			],
 			$options_clean
 		);
 	}

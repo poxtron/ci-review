@@ -5,20 +5,10 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class LintLintGetIssuesTest extends TestCase {
-	var $options_php = array(
-		'php-path'	=> null,
-	);
-
-	protected function setUp() {
-		vipgoci_unittests_get_config_values(
-			'lint-scan',
-			$this->options_php
-		);
-	}
-
-	protected function tearDown() {
-		$this->options_php = null;
-	}
+	var $options_php
+		= [
+			'php-path' => null,
+		];
 
 	/**
 	 * @covers ::vipgoci_lint_parse_results
@@ -26,11 +16,11 @@ final class LintLintGetIssuesTest extends TestCase {
 	public function testLintGetIssues1() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options_php,
-			array(  ),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -61,8 +51,7 @@ final class LintLintGetIssuesTest extends TestCase {
 		vipgoci_unittests_output_unsuppress();
 
 		$this->assertEquals(
-			array(
-			),
+			[],
 			$lint_issues_parsed
 		);
 	}
@@ -73,11 +62,11 @@ final class LintLintGetIssuesTest extends TestCase {
 	public function testLintDoScan2() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options_php,
-			array(  ),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -108,21 +97,32 @@ final class LintLintGetIssuesTest extends TestCase {
 		vipgoci_unittests_output_unsuppress();
 
 		/* Fix PHP compatibility issue */
-		$lint_issues_parsed[3][0]['message'] = 
-			vipgoci_unittests_php_syntax_error_compat(
-				$lint_issues_parsed[3][0]['message']
-			);
+		$lint_issues_parsed[3][0]['message']
+			= vipgoci_unittests_php_syntax_error_compat(
+			$lint_issues_parsed[3][0]['message']
+		);
 
 		$this->assertEquals(
-			array(
-				3 => array(
-					array(
-						'message' 	=> "syntax error, unexpected end of file, expecting ',' or ';'",
-						'level'		=> 'ERROR',
-					)
-				)
-			),
+			[
+				3 => [
+					[
+						'message' => "syntax error, unexpected end of file, expecting ',' or ';'",
+						'level'   => 'ERROR',
+					]
+				]
+			],
 			$lint_issues_parsed
 		);
+	}
+
+	protected function setUp() {
+		vipgoci_unittests_get_config_values(
+			'lint-scan',
+			$this->options_php
+		);
+	}
+
+	protected function tearDown() {
+		$this->options_php = null;
 	}
 }

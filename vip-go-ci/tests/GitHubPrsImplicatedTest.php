@@ -5,52 +5,18 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class GitHubPrsImplicatedTest extends TestCase {
-	var $options_git_repo_tests = array(
-		'commit-test-repo-pr-files-changed-1'	=> null,
-	);
+	var $options_git_repo_tests
+		= [
+			'commit-test-repo-pr-files-changed-1' => null,
+		];
 
-	var $options_git = array(
-		'git-path'		=> null,
-		'github-repo-url'	=> null,
-		'repo-name'		=> null,
-		'repo-owner'		=> null,
-	);
-
-	protected function setUp() {
-		vipgoci_unittests_get_config_values(
-			'git-repo-tests',
-			$this->options_git_repo_tests
-		);
-
-		vipgoci_unittests_get_config_values(
-			'git',
-			$this->options_git
-		);
-
-		$this->options = array_merge(
-			$this->options_git_repo_tests,
-			$this->options_git
-		);
-
-		$this->options[ 'github-token' ] =
-			vipgoci_unittests_get_config_value(
-				'git-secrets',
-				'github-token',
-				true // Fetch from secrets file
-			);
-
-		$this->options['lint-skip-folders'] = array();
-
-		$this->options['phpcs-skip-folders'] = array();
-
-		$this->options['branches-ignore'] = array();
-	}
-
-	protected function tearDown() {
-		$this->options_git_repo_tests = null;
-		$this->options_git = null;
-		$this->options = null;
-	}
+	var $options_git
+		= [
+			'git-path'        => null,
+			'github-repo-url' => null,
+			'repo-name'       => null,
+			'repo-owner'      => null,
+		];
 
 	/**
 	 * @covers ::vipgoci_github_prs_implicated
@@ -58,16 +24,16 @@ final class GitHubPrsImplicatedTest extends TestCase {
 	public function testGitHubPrsImplicated1() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array( 'github-token', 'token' ),
+			[ 'github-token', 'token' ],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
-		$this->options['commit'] =
-			$this->options['commit-test-repo-pr-files-changed-1'];
+		$this->options['commit']
+			= $this->options['commit-test-repo-pr-files-changed-1'];
 
 		vipgoci_unittests_output_suppress();
 
@@ -97,5 +63,41 @@ final class GitHubPrsImplicatedTest extends TestCase {
 		);
 
 		unset( $this->options['commit'] );
+	}
+
+	protected function setUp() {
+		vipgoci_unittests_get_config_values(
+			'git-repo-tests',
+			$this->options_git_repo_tests
+		);
+
+		vipgoci_unittests_get_config_values(
+			'git',
+			$this->options_git
+		);
+
+		$this->options = array_merge(
+			$this->options_git_repo_tests,
+			$this->options_git
+		);
+
+		$this->options['github-token']
+			= vipgoci_unittests_get_config_value(
+			'git-secrets',
+			'github-token',
+			true // Fetch from secrets file
+		);
+
+		$this->options['lint-skip-folders'] = [];
+
+		$this->options['phpcs-skip-folders'] = [];
+
+		$this->options['branches-ignore'] = [];
+	}
+
+	protected function tearDown() {
+		$this->options_git_repo_tests = null;
+		$this->options_git            = null;
+		$this->options                = null;
 	}
 }

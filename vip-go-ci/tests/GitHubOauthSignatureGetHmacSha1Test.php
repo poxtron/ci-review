@@ -10,14 +10,14 @@ final class GitHubOauthSignatureGetHmacSha1Test extends TestCase {
 	 */
 	public function testOAuthHmacSha1() {
 		$oauth_method = 'GET';
-		$oauth_url = 'https://automattic.com';
+		$oauth_url    = 'https://automattic.com';
 
-		$oauth_keys = array(
-			'oauth_consumer_key'	=> '12',
-			'oauth_consumer_secret'	=> '34',
-			'oauth_token'		=> '56',
-			'oauth_token_secret'	=> '78',
-		);
+		$oauth_keys = [
+			'oauth_consumer_key'    => '12',
+			'oauth_consumer_secret' => '34',
+			'oauth_token'           => '56',
+			'oauth_token_secret'    => '78',
+		];
 
 		$hmac_sha1 = vipgoci_oauth1_signature_get_hmac_sha1(
 			$oauth_method,

@@ -10,7 +10,7 @@ final class MiscFindFieldsInArrayTest extends TestCase {
 	 */
 	public function testFindFields1() {
 		$this->assertEquals(
-			array(
+			[
 				0 => false,
 				1 => true,
 				2 => true,
@@ -19,59 +19,59 @@ final class MiscFindFieldsInArrayTest extends TestCase {
 				5 => false,
 				6 => false,
 				7 => false,
-			),
+			],
 			vipgoci_find_fields_in_array(
-				array(
-					'a' => array(
+				[
+					'a' => [
 						920,
 						100000,
-					),
-					'b' => array(
+					],
+					'b' => [
 						700,
-					),
-				),
-				array(
-					array(
+					],
+				],
+				[
+					[
 						'a' => 920,
 						'b' => 500,
 						'c' => 0,
 						'd' => 1,
-					),
-					array(
+					],
+					[
 						'a' => 920,
 						'b' => 700,
 						'c' => 0,
 						'd' => 2,
-					),
-					array(
+					],
+					[
 						'a' => 100000,
 						'b' => 700,
 						'c' => 0,
 						'd' => 2,
-					),
-					array(
+					],
+					[
 						'a' => 920,
 						'b' => 700,
 						'c' => 0,
 						'd' => 2,
-					),
-					array(
+					],
+					[
 						'a' => 900,
 						'b' => 720,
 						'c' => 0,
 						'd' => 2,
-					),
-					array(
+					],
+					[
 						'a' => 900,
-					),
-					array(
+					],
+					[
 						'b' => 900,
-					),
-					array(
+					],
+					[
 						'c' => 920,
 						'd' => 700,
-					),
-				)
+					],
+				]
 			)
 		);
 	}

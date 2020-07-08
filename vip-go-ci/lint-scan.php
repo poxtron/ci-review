@@ -28,8 +28,7 @@ function vipgoci_lint_do_scan_file(
 		escapeshellarg( $temp_file_name )
 	);
 
-
-	$file_issues_arr = array();
+	$file_issues_arr = [];
 
 	/*
 	 * Execute linter, grab issues in array,
@@ -47,13 +46,13 @@ function vipgoci_lint_do_scan_file(
 	 * when linting PHP files, remove those.
 	 *
 	 */
-	$file_issues_arr =
-		array_filter(
-			$file_issues_arr,
-			function( $array_item ) {
-				return '' !== $array_item;
-			}
-		);
+	$file_issues_arr
+		= array_filter(
+		$file_issues_arr,
+		function ( $array_item ) {
+			return '' !== $array_item;
+		}
+	);
 
 	/*
 	 * Some PHP versions use slightly
@@ -64,9 +63,9 @@ function vipgoci_lint_do_scan_file(
 	$file_issues_arr = array_map(
 		function ( $str ) {
 			if ( strpos(
-				$str,
-				'Parse error: '
-			) === 0 ) {
+				     $str,
+				     'Parse error: '
+			     ) === 0 ) {
 				$str = str_replace(
 					'Parse error: ',
 					'PHP Parse error:  ',
@@ -82,29 +81,27 @@ function vipgoci_lint_do_scan_file(
 	/*
 	 * For some reason some PHP versions
 	 * output the same errors two times, remove
-	 * any duplicates. 
+	 * any duplicates.
 	 */
 
-	$file_issues_arr =
-		array_values(
-			array_unique(
-				$file_issues_arr
-			)
-		);
-
+	$file_issues_arr
+		= array_values(
+		array_unique(
+			$file_issues_arr
+		)
+	);
 
 	vipgoci_log(
 		'PHP linting execution details',
-		array(
-			'cmd'			=> $cmd,
-			'file_issues_arr'	=> $file_issues_arr,
-		),
+		[
+			'cmd'             => $cmd,
+			'file_issues_arr' => $file_issues_arr,
+		],
 		2
 	);
 
 	return $file_issues_arr;
 }
-
 
 /*
  * Parse array of results, extract the problems
@@ -116,30 +113,24 @@ function vipgoci_lint_parse_results(
 	$temp_file_name,
 	$file_issues_arr
 ) {
-
-	$file_issues_arr_new = array();
+	$file_issues_arr_new = [];
 
 	// Loop through everything we got from the command
-	foreach( $file_issues_arr as $index => $message ) {
-		if (
-			( 0 === strpos(
+	foreach ( $file_issues_arr as $index => $message ) {
+		if ( ( 0 === strpos(
 				$message,
 				'No syntax errors detected'
-			) )
-		) {
+			) ) ) {
 			// Skip non-errors we do not care about
 			continue;
 		}
-
 
 		/*
 		 * Catch any syntax-error problems
 		 */
 
-		if (
-			( false !== strpos( $message, ' on line ' ) ) &&
-			( false !== strpos( $message, 'PHP Parse error:' ) )
-		) {
+		if ( ( false !== strpos( $message, ' on line ' ) )
+		     && ( false !== strpos( $message, 'PHP Parse error:' ) ) ) {
 			/*
 			 * Get rid of 'PHP Parse...' which is not helpful
 			 * for users when seen on GitHub
@@ -151,15 +142,13 @@ function vipgoci_lint_parse_results(
 				$message
 			);
 
-
 			/*
 			 * Figure out on what line the problem is
 			 */
 			$pos = strpos(
-				$message,
-				' on line '
-			) + strlen( ' on line ' );
-
+				       $message,
+				       ' on line '
+			       ) + strlen( ' on line ' );
 
 			$file_line = substr(
 				$message,
@@ -170,7 +159,6 @@ function vipgoci_lint_parse_results(
 			unset( $pos );
 			unset( $pos2 );
 
-
 			/*
 			 * Get rid of name of the file, and
 			 * the rest of the message, too.
@@ -180,16 +168,15 @@ function vipgoci_lint_parse_results(
 			$message = substr( $message, 0, $pos3 );
 			$message = ltrim( rtrim( $message ) );
 
-			$file_issues_arr_new[ $file_line ][] = array(
+			$file_issues_arr_new[ $file_line ][] = [
 				'message' => $message,
-				'level' => 'ERROR'
-			);
+				'level'   => 'ERROR'
+			];
 		}
 	}
 
 	return $file_issues_arr_new;
 }
-
 
 /**
  * Run PHP lint on all files in a path
@@ -199,9 +186,9 @@ function vipgoci_lint_scan_commit(
 	&$commit_issues_submit,
 	&$commit_issues_stats
 ) {
-	$repo_owner = $options['repo-owner'];
-	$repo_name  = $options['repo-name'];
-	$commit_id  = $options['commit'];
+	$repo_owner   = $options['repo-owner'];
+	$repo_name    = $options['repo-name'];
+	$commit_id    = $options['commit'];
 	$github_token = $options['token'];
 
 	vipgoci_runtime_measure( VIPGOCI_RUNTIME_START, 'lint_scan_commit' );
@@ -209,13 +196,12 @@ function vipgoci_lint_scan_commit(
 	vipgoci_log(
 		'About to lint PHP-files',
 
-		array(
-			'repo_owner'	=> $repo_owner,
-			'repo_name'	=> $repo_name,
-			'commit_id'	=> $commit_id,
-		)
+		[
+			'repo_owner' => $repo_owner,
+			'repo_name'  => $repo_name,
+			'commit_id'  => $commit_id,
+		]
 	);
-
 
 	// Ask for information about the commit
 	$commit_info = vipgoci_github_fetch_commit_info(
@@ -223,25 +209,21 @@ function vipgoci_lint_scan_commit(
 		$repo_name,
 		$commit_id,
 		$github_token,
-		array(
-			'file_extensions'
-				=> array( 'php' ),
+		[
+			'file_extensions' => [ 'php' ],
 
-			'status'
-				=> array( 'added', 'modified' ),
-		)
+			'status' => [ 'added', 'modified' ],
+		]
 	);
 
 	// Fetch list of files that exist in the commit
 	$commit_tree = vipgoci_gitrepo_fetch_tree(
 		$options,
 		$commit_id,
-		array(
-			'file_extensions'
-				=> array( 'php' ),
-			'skip_folders'
-				=> $options['lint-skip-folders'],
-		)
+		[
+			'file_extensions' => [ 'php' ],
+			'skip_folders'    => $options['lint-skip-folders'],
+		]
 	);
 
 	// Ask for all Pull-Requests that this commit is part of
@@ -253,12 +235,11 @@ function vipgoci_lint_scan_commit(
 		$options['branches-ignore']
 	);
 
-
 	/*
 	 * Lint every PHP file existing in the commit
 	 */
 
-	foreach( $commit_tree as $filename ) {
+	foreach ( $commit_tree as $filename ) {
 		vipgoci_runtime_measure( VIPGOCI_RUNTIME_START, 'lint_scan_single_file' );
 
 		$file_contents = vipgoci_gitrepo_fetch_committed_file(
@@ -294,13 +275,13 @@ function vipgoci_lint_scan_commit(
 		vipgoci_log(
 			'About to PHP-lint file',
 
-			array(
-				'repo_owner' => $repo_owner,
-				'repo_name' => $repo_name,
-				'commit_id' => $commit_id,
-				'filename' => $filename,
+			[
+				'repo_owner'     => $repo_owner,
+				'repo_name'      => $repo_name,
+				'commit_id'      => $commit_id,
+				'filename'       => $filename,
 				'temp_file_name' => $temp_file_name,
-			)
+			]
 		);
 
 		$file_issues_arr_raw = vipgoci_lint_do_scan_file(
@@ -310,7 +291,6 @@ function vipgoci_lint_scan_commit(
 
 		/* Get rid of temporary file */
 		unlink( $temp_file_name );
-
 
 		/*
 		 * Process the results, get them in an array format
@@ -324,15 +304,15 @@ function vipgoci_lint_scan_commit(
 
 		vipgoci_log(
 			'Linting issues details',
-			array(
-				'repo_owner'		=> $repo_owner,
-				'repo_name'		=> $repo_name,
-				'commit_id'		=> $commit_id,
-				'filename'		=> $filename,
-				'temp_file_name'	=> $temp_file_name,
-				'file_issues_arr'	=> $file_issues_arr,
-				'file_issues_arr_raw'	=> $file_issues_arr_raw,
-			),
+			[
+				'repo_owner'          => $repo_owner,
+				'repo_name'           => $repo_name,
+				'commit_id'           => $commit_id,
+				'filename'            => $filename,
+				'temp_file_name'      => $temp_file_name,
+				'file_issues_arr'     => $file_issues_arr,
+				'file_issues_arr_raw' => $file_issues_arr_raw,
+			],
 			2
 		);
 
@@ -350,26 +330,22 @@ function vipgoci_lint_scan_commit(
 		 * for each Pull-Request -- actually
 		 * queue issues for submission.
 		 */
-		foreach( $prs_implicated as $pr_item ) {
+		foreach ( $prs_implicated as $pr_item ) {
 			vipgoci_log(
 				'Linting issues found',
-				array(
-					'repo_owner'		=> $repo_owner,
-					'repo_name'		=> $repo_name,
-					'commit_id'		=> $commit_id,
+				[
+					'repo_owner' => $repo_owner,
+					'repo_name'  => $repo_name,
+					'commit_id'  => $commit_id,
 
-					'filename'
-						=> $filename,
+					'filename' => $filename,
 
-					'pr_number'
-						=> $pr_item->number,
+					'pr_number' => $pr_item->number,
 
-					'file_issues_arr'
-						=> $file_issues_arr,
-				),
+					'file_issues_arr' => $file_issues_arr,
+				],
 				2
 			);
-
 
 			/*
 			 * Loop through array of lines in which
@@ -377,8 +353,7 @@ function vipgoci_lint_scan_commit(
 			 */
 
 			foreach (
-				$file_issues_arr as
-					$file_issue_line => $file_issue_values
+				$file_issues_arr as $file_issue_line => $file_issue_values
 			) {
 				/*
 				 * Loop through each issue for the particular
@@ -386,35 +361,27 @@ function vipgoci_lint_scan_commit(
 				 */
 
 				foreach (
-					$file_issue_values as
-						$file_issue_val_item
+					$file_issue_values as $file_issue_val_item
 				) {
-					$commit_issues_submit[
-						$pr_item->number
-					][] = array(
-						'type'		=> VIPGOCI_STATS_LINT,
+					$commit_issues_submit[ $pr_item->number ][] = [
+						'type' => VIPGOCI_STATS_LINT,
 
-						'file_name'	=>
-							$filename,
+						'file_name' => $filename,
 
-						'file_line'	=> intval(
+						'file_line' => intval(
 							$file_issue_line
 						),
 
-						'issue'		=>
-							$file_issue_val_item
-					);
+						'issue' => $file_issue_val_item
+					];
 
-					$commit_issues_stats[
-						$pr_item->number
-					]['error']++;
+					$commit_issues_stats[ $pr_item->number ]['error'] ++;
 				}
 			}
 		}
 
 		vipgoci_runtime_measure( VIPGOCI_RUNTIME_STOP, 'lint_scan_single_file' );
 	}
-
 
 	/*
 	 * Reduce memory-usage, as possible.

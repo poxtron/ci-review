@@ -11,29 +11,26 @@ function vipgoci_results_remove_existing_github_comments(
 	$prs_implicated,
 	&$results,
 	$repost_comments_from_dismissed_reviews = false,
-	$prs_events_dismissed_by_team = array()
+	$prs_events_dismissed_by_team = []
 ) {
 	vipgoci_log(
-		'Removing existing GitHub comments from results' .
-			' to be posted to GitHub API',
-		array(
-			'repo_owner' => $options['repo-owner'],
-			'repo_name' => $options['repo-name'],
-			'prs_implicated' => array_keys( $prs_implicated ),
+		'Removing existing GitHub comments from results' . ' to be posted to GitHub API',
+		[
+			'repo_owner'                             => $options['repo-owner'],
+			'repo_name'                              => $options['repo-name'],
+			'prs_implicated'                         => array_keys( $prs_implicated ),
 			'repost_comments_from_dismissed_reviews' => $repost_comments_from_dismissed_reviews,
-			'prs_events_dismissed_by_team' => $prs_events_dismissed_by_team,
-		)
+			'prs_events_dismissed_by_team'           => $prs_events_dismissed_by_team,
+		]
 	);
 
-	$comments_removed = array();
+	$comments_removed = [];
 
 	foreach ( $prs_implicated as $pr_item ) {
-		$prs_comments = array();
+		$prs_comments = [];
 
-		if ( ! isset(
-			$comments_removed[ $pr_item->number ]
-		) ) {
-			$comments_removed[ $pr_item->number ] = array();
+		if ( ! isset( $comments_removed[ $pr_item->number ] ) ) {
+			$comments_removed[ $pr_item->number ] = [];
 		}
 
 		/*
@@ -64,28 +61,19 @@ function vipgoci_results_remove_existing_github_comments(
 			unset( $pr_item_commit_id );
 		}
 
-
 		/*
 		 * Ignore dismissed reviews, if requested.
 		 */
 		if ( true === $repost_comments_from_dismissed_reviews ) {
 			vipgoci_log(
-				'Later on, will make sure comments ' .
-					'that are part of dismissed reviews ' .
-					'will be submitted again, if the ' .
-					'underlying issue was detected ' .
-					'during the run. In case of such a setting' .
-					'and such reviews existing, excluding ' .
-					'reviews (and thus comments) that are submitted ' .
-					'by members of a particular team ' .
-					'from this process',
-				array(
-					'teams' =>
-						$options['dismissed-reviews-exclude-reviews-from-team'],
+				'Later on, will make sure comments ' . 'that are part of dismissed reviews ' . 'will be submitted again, if the '
+				. 'underlying issue was detected ' . 'during the run. In case of such a setting' . 'and such reviews existing, excluding '
+				. 'reviews (and thus comments) that are submitted ' . 'by members of a particular team ' . 'from this process',
+				[
+					'teams' => $options['dismissed-reviews-exclude-reviews-from-team'],
 
-					'pr_number' =>
-						$pr_item->number,
-				)
+					'pr_number' => $pr_item->number,
+				]
 			);
 
 			/*
@@ -97,10 +85,10 @@ function vipgoci_results_remove_existing_github_comments(
 				$options['repo-name'],
 				$pr_item->number,
 				$options['token'],
-				array(
+				[
 					'login' => 'myself',
-					'state' => array( 'DISMISSED' )
-				)
+					'state' => [ 'DISMISSED' ]
+				]
 			);
 
 			$dismissed_reviews = array_column(
@@ -116,44 +104,30 @@ function vipgoci_results_remove_existing_github_comments(
 			 * honor this here.
 			 */
 			if ( ! empty(
-				$prs_events_dismissed_by_team[
-					$pr_item->number
-				]
+			$prs_events_dismissed_by_team[ $pr_item->number ]
 			) ) {
-
 				$all_review_ids = $dismissed_reviews;
 
 				$dismissed_reviews = array_diff(
 					$all_review_ids,
-					$prs_events_dismissed_by_team[
-						$pr_item->number
-					]
+					$prs_events_dismissed_by_team[ $pr_item->number ]
 				);
 
 				vipgoci_log(
-					'Excluding certain reviews from ' .
-						'list of previously gathered dismissed reviews; ' .
-						'will only keep reviews that were not dismissed by ' .
-						'members of a particular team. The comments of ' .
-						'the outstanding, kept, reviews might be posted again ' .
-						'if the underlying issue was detected',
-					array(
-						'prs_events_dismissed_by_team_and_pr' =>
-							$prs_events_dismissed_by_team[
-								$pr_item->number
-							],
+					'Excluding certain reviews from ' . 'list of previously gathered dismissed reviews; '
+					. 'will only keep reviews that were not dismissed by ' . 'members of a particular team. The comments of '
+					. 'the outstanding, kept, reviews might be posted again ' . 'if the underlying issue was detected',
+					[
+						'prs_events_dismissed_by_team_and_pr' => $prs_events_dismissed_by_team[ $pr_item->number ],
 
-						'all_review_ids' =>
-							$all_review_ids,
+						'all_review_ids' => $all_review_ids,
 
-						'dismissed_reviews' =>
-							$dismissed_reviews,
-					)
+						'dismissed_reviews' => $dismissed_reviews,
+					]
 				);
 
 				unset( $all_review_ids );
 			}
-
 
 			/*
 			 * Loop through each file to have comments
@@ -173,43 +147,34 @@ function vipgoci_results_remove_existing_github_comments(
 			 * from this, as per above.
 			 */
 
-			$removed_comments = array();
+			$removed_comments = [];
 
-			foreach(
-				$prs_comments as
-					$pr_comment_key => $pr_comments_items
+			foreach (
+				$prs_comments as $pr_comment_key => $pr_comments_items
 			) {
-				foreach(
-					$pr_comments_items as
-					$pr_review_key => $pr_review_comment
+				foreach (
+					$pr_comments_items as $pr_review_key => $pr_review_comment
 				) {
 					if ( false === in_array(
-						$pr_review_comment->pull_request_review_id,
-						$dismissed_reviews
-					) ) {
+							$pr_review_comment->pull_request_review_id,
+							$dismissed_reviews
+						) ) {
 						continue;
 					}
 
-					$removed_comments[] = array(
-						'pr_number' =>
-							$pr_item->number,
+					$removed_comments[] = [
+						'pr_number' => $pr_item->number,
 
-						'pull_request_review_id' =>
-							$pr_review_comment->pull_request_review_id,
+						'pull_request_review_id' => $pr_review_comment->pull_request_review_id,
 
-						'comment_id' =>
-							$pr_review_comment->id,
+						'comment_id' => $pr_review_comment->id,
 
-						'message_body' =>
-							$pr_review_comment->body,
+						'message_body' => $pr_review_comment->body,
 
-						'message_created_at' =>
-							$pr_review_comment->created_at,
+						'message_created_at' => $pr_review_comment->created_at,
 
-						'message_updated_at' =>
-							$pr_review_comment->updated_at,
-					);
-
+						'message_updated_at' => $pr_review_comment->updated_at,
+					];
 
 					/*
 					 * Comment is a part of a dismissed review
@@ -218,83 +183,56 @@ function vipgoci_results_remove_existing_github_comments(
 					 * never there.
 					 */
 					unset(
-						$prs_comments[
-							$pr_comment_key
-						][
-							$pr_review_key
-						]
+						$prs_comments[ $pr_comment_key ][ $pr_review_key ]
 					);
 				}
 			}
 
 			vipgoci_log(
-				'Removed following comments from list of previously submitted ' .
-					'comments to older PR reviews, as they are ' .
-					'part of dismissed reviews. Note that some ' .
-					'dismissed reviews might have been excluded previously',
+				'Removed following comments from list of previously submitted ' . 'comments to older PR reviews, as they are '
+				. 'part of dismissed reviews. Note that some ' . 'dismissed reviews might have been excluded previously',
 
-				array(
-					'removed_comments' =>
-						$removed_comments,
-				)
+				[
+					'removed_comments' => $removed_comments,
+				]
 			);
 
 			unset( $removed_comments );
 			unset( $dismissed_reviews );
 		}
 
-
-		foreach(
-			$results['issues'][ $pr_item->number ] as
-				$tobe_submitted_cmt_key =>
-					$tobe_submitted_cmt
+		foreach (
+			$results['issues'][ $pr_item->number ] as $tobe_submitted_cmt_key => $tobe_submitted_cmt
 		) {
-
 			/*
 			 * Filter out issues that have already been
 			 * reported to GitHub.
 			 */
 
-			if (
-				// Only do check if everything above is looking good
-				vipgoci_github_comment_match(
-					$tobe_submitted_cmt['file_name'],
-					$tobe_submitted_cmt['file_line'],
-					$tobe_submitted_cmt['issue']['message'],
-					$prs_comments
-				)
-			) {
+			if (// Only do check if everything above is looking good
+			vipgoci_github_comment_match(
+				$tobe_submitted_cmt['file_name'],
+				$tobe_submitted_cmt['file_line'],
+				$tobe_submitted_cmt['issue']['message'],
+				$prs_comments
+			) ) {
 				/*
 				 * Keep a record of what we remove.
 				 */
-				$comments_removed[ $pr_item->number ][] =
-					$tobe_submitted_cmt;
+				$comments_removed[ $pr_item->number ][]
+					= $tobe_submitted_cmt;
 
 				/* Remove it */
 				unset(
-					$results[
-						'issues'
-					][
-						$pr_item->number
-					][
-						$tobe_submitted_cmt_key
-					]
+					$results['issues'][ $pr_item->number ][ $tobe_submitted_cmt_key ]
 				);
 
 				/*
 				 * Update statistics
 				 */
-				$results[
-					'stats'
-				][
-					$tobe_submitted_cmt['type']
-				][
-					$pr_item->number
-				][
-					strtolower(
-						$tobe_submitted_cmt['issue']['type']
-					)
-				]--;
+				$results['stats'][ $tobe_submitted_cmt['type'] ][ $pr_item->number ][ strtolower(
+					$tobe_submitted_cmt['issue']['type']
+				) ] --;
 			}
 		}
 
@@ -303,16 +241,8 @@ function vipgoci_results_remove_existing_github_comments(
 		 * array, so that no array
 		 * keys are missing.
 		 */
-		$results[
-			'issues'
-		][
-			$pr_item->number
-		] = array_values(
-			$results[
-				'issues'
-			][
-				$pr_item->number
-			]
+		$results['issues'][ $pr_item->number ] = array_values(
+			$results['issues'][ $pr_item->number ]
 		);
 	}
 
@@ -320,15 +250,12 @@ function vipgoci_results_remove_existing_github_comments(
 	 * Report what we removed.
 	 */
 	vipgoci_log(
-		'Removed following comments from array of ' .
-		'to be submitted comments to PRs, as they ' .
-		'have been submitted already',
-		array(
+		'Removed following comments from array of ' . 'to be submitted comments to PRs, as they ' . 'have been submitted already',
+		[
 			'comments_removed' => $comments_removed
-		)
+		]
 	);
 }
-
 
 /*
  * For each approved file, remove any issues
@@ -350,42 +277,36 @@ function vipgoci_results_approved_files_comments_remove(
 	&$results,
 	$auto_approved_files_arr
 ) {
-
-	$issues_removed = array(
-	);
+	$issues_removed = [];
 
 	vipgoci_log(
-		'Removing any potential issues (errors, warnings) ' .
-			'found for approved files from internal results',
+		'Removing any potential issues (errors, warnings) ' . 'found for approved files from internal results',
 
-		array(
+		[
 			'auto_approved_files_arr' => $auto_approved_files_arr,
-		)
+		]
 	);
 
 	/*
- 	 * Loop through each Pull-Request
+	  * Loop through each Pull-Request
 	 */
-	foreach( $results['issues'] as
-		$pr_number => $pr_issues
+	foreach (
+		$results['issues'] as $pr_number => $pr_issues
 	) {
 		/*
 		 * Loop through each issue affecting each
 		 * Pull-Request.
 		 */
-		foreach( $pr_issues as
-			$issue_number => $issue_item
+		foreach (
+			$pr_issues as $issue_number => $issue_item
 		) {
-
 			/*
 			 * If the file affected is
 			 * not found in the auto-approved files,
 			 * do not to anything.
 			 */
 			if ( ! isset(
-				$auto_approved_files_arr[
-					$issue_item['file_name']
-				]
+				$auto_approved_files_arr[ $issue_item['file_name'] ]
 			) ) {
 				continue;
 			}
@@ -396,8 +317,8 @@ function vipgoci_results_approved_files_comments_remove(
 			 */
 
 			if ( strtolower(
-				$issue_item['issue']['type']
-			) === 'info' ) {
+				     $issue_item['issue']['type']
+			     ) === 'info' ) {
 				continue;
 			}
 
@@ -407,62 +328,37 @@ function vipgoci_results_approved_files_comments_remove(
 			 * from the array of submittable issues.
 			 */
 			unset(
-				$results[
-					'issues'
-				][
-					$pr_number
-				][
-					$issue_number
-				]
+				$results['issues'][ $pr_number ][ $issue_number ]
 			);
 
 			/*
 			 * Update statistics accordingly.
 			 */
-			$results[
-				'stats'
-			][
-				$issue_item['type']
-			][
-				$pr_number
-			][
-				strtolower(
-					$issue_item['issue']['type']
-				)
-			]--;
+			$results['stats'][ $issue_item['type'] ][ $pr_number ][ strtolower(
+				$issue_item['issue']['type']
+			) ] --;
 
 			/*
 			 * Update our own information array on
 			 * what we did.
 			 */
-			$issues_removed[
-				$pr_number
-			][] = $issue_item;
+			$issues_removed[ $pr_number ][] = $issue_item;
 		}
 
 		/*
 		 * Re-order the array as
 		 * some keys might be missing
 		 */
-		$results[
-			'issues'
-		][
-			$pr_number
-		] = array_values(
-			$results[
-				'issues'
-			][
-				$pr_number
-			]
+		$results['issues'][ $pr_number ] = array_values(
+			$results['issues'][ $pr_number ]
 		);
 	}
 
-
 	vipgoci_log(
 		'Completed cleaning out issues for pre-approved files',
-		array(
+		[
 			'issues_removed' => $issues_removed,
-		)
+		]
 	);
 }
 
@@ -479,16 +375,12 @@ function vipgoci_results_filter_comments_to_max(
 	&$results,
 	&$prs_comments_maxed
 ) {
-
 	vipgoci_log(
-		'Preparing to remove any excessive number comments from array of ' .
-			'issues to be submitted to PRs',
-		array(
-			'review_comments_total_max'
-				=> $options['review-comments-total-max'],
-		)
+		'Preparing to remove any excessive number comments from array of ' . 'issues to be submitted to PRs',
+		[
+			'review_comments_total_max' => $options['review-comments-total-max'],
+		]
 	);
-
 
 	/*
 	 * We might need to remove comments.
@@ -502,11 +394,10 @@ function vipgoci_results_filter_comments_to_max(
 	/*
 	 * Keep track of what we remove.
 	 */
-	$comments_removed = array();
+	$comments_removed = [];
 
-	foreach(
-		$results['issues'] as
-			$pr_number => $pr_issues_comments
+	foreach (
+		$results['issues'] as $pr_number => $pr_issues_comments
 	) {
 		/*
 		 * Take into account previously submitted comments
@@ -517,10 +408,10 @@ function vipgoci_results_filter_comments_to_max(
 			vipgoci_github_pr_reviews_comments_get_by_pr(
 				$options,
 				$pr_number,
-				array(
-					'login'			=> 'myself',
-					'comments_active'	=> true,
-				)
+				[
+					'login'           => 'myself',
+					'comments_active' => true,
+				]
 			)
 		);
 
@@ -532,14 +423,8 @@ function vipgoci_results_filter_comments_to_max(
 		 * from the maximum specified.
 		 */
 
-		$comments_to_remove =
-			(
-				count( $pr_issues_comments )
-				+
-				$pr_previous_comments_cnt
-			)
-			-
-			$options['review-comments-total-max'];
+		$comments_to_remove
+			= ( count( $pr_issues_comments ) + $pr_previous_comments_cnt ) - $options['review-comments-total-max'];
 
 		/*
 		 * If there are no comments to remove,
@@ -547,16 +432,10 @@ function vipgoci_results_filter_comments_to_max(
 		 */
 		if ( $comments_to_remove <= 0 ) {
 			continue;
-		}
-
-		/*
+		} /*
 		 * If more are to be removed than are to be
 		 * submitted, limit to the number of available ones.
-		 */
-		else if (
-			$comments_to_remove >
-				count( $pr_issues_comments )
-		) {
+		 */ elseif ( $comments_to_remove > count( $pr_issues_comments ) ) {
 			$comments_to_remove = count( $pr_issues_comments );
 		}
 
@@ -567,7 +446,7 @@ function vipgoci_results_filter_comments_to_max(
 		$severity_min = 0;
 		$severity_max = 0;
 
-		foreach( $pr_issues_comments as $pr_issue ) {
+		foreach ( $pr_issues_comments as $pr_issue ) {
 			$severity_min = min(
 				$pr_issue['issue']['severity'],
 				$severity_min
@@ -584,14 +463,11 @@ function vipgoci_results_filter_comments_to_max(
 		 * and remove comments as needed.
 		 */
 		for (
-			$severity_current = $severity_min;
-			$severity_current <= $severity_max &&
-				$comments_to_remove > 0;
-			$severity_current++
+			$severity_current = $severity_min; $severity_current <= $severity_max
+			                                   && $comments_to_remove > 0; $severity_current ++
 		) {
-			foreach(
-				$pr_issues_comments as
-					$pr_issue_key => $pr_issue
+			foreach (
+				$pr_issues_comments as $pr_issue_key => $pr_issue
 			) {
 				/*
 				 * If we have removed enough, stop here.
@@ -603,10 +479,7 @@ function vipgoci_results_filter_comments_to_max(
 				/*
 				 * Not correct severity level? Ignore.
 				 */
-				if (
-					$pr_issue['issue']['severity'] !==
-					$severity_current
-				) {
+				if ( $pr_issue['issue']['severity'] !== $severity_current ) {
 					continue;
 				}
 
@@ -616,45 +489,25 @@ function vipgoci_results_filter_comments_to_max(
 				 */
 
 				unset(
-					$results[
-						'issues'
-					][
-						$pr_number
-					][
-						$pr_issue_key
-					]
+					$results['issues'][ $pr_number ][ $pr_issue_key ]
 				);
 
-				$results[
-					'stats'
-				][
-					$pr_issue['type']
-				][
-					$pr_number
-				][
-					strtolower(
-						$pr_issue['issue']['type']
-					)
-				]--;
+				$results['stats'][ $pr_issue['type'] ][ $pr_number ][ strtolower(
+					$pr_issue['issue']['type']
+				) ] --;
 
 				/*
 				 * Keep track of what we remove
 				 */
 				if ( ! isset(
-					$comments_removed[
-						$pr_number
-					]
+					$comments_removed[ $pr_number ]
 				) ) {
-					$comments_removed[
-						$pr_number
-					] = array();
+					$comments_removed[ $pr_number ] = [];
 				}
 
-				$comments_removed[
-					$pr_number
-				][] = $pr_issue;
+				$comments_removed[ $pr_number ][] = $pr_issue;
 
-				$comments_to_remove--;
+				$comments_to_remove --;
 			}
 		}
 
@@ -663,16 +516,8 @@ function vipgoci_results_filter_comments_to_max(
 		 * keep continuous ordering
 		 * of index.
 		 */
-		$results[
-			'issues'
-		][
-			$pr_number
-		] = array_values(
-			$results[
-				'issues'
-			][
-				$pr_number
-			]
+		$results['issues'][ $pr_number ] = array_values(
+			$results['issues'][ $pr_number ]
 		);
 	}
 
@@ -686,14 +531,12 @@ function vipgoci_results_filter_comments_to_max(
 		$comments_removed
 	);
 
-
 	vipgoci_log(
-		'Removed issue comments from array of to be submitted ' .
-			'comments to PRs due to limit constraints',
-		array(
-			'review_comments_total_max'	=> $options['review-comments-total-max'],
-			'comments_removed'		=> $comments_removed,
-		)
+		'Removed issue comments from array of to be submitted ' . 'comments to PRs due to limit constraints',
+		[
+			'review_comments_total_max' => $options['review-comments-total-max'],
+			'comments_removed'          => $comments_removed,
+		]
 	);
 
 	return;
@@ -710,25 +553,20 @@ function vipgoci_results_filter_ignorable(
 	$options,
 	&$results
 ) {
-	$comments_removed = array();
+	$comments_removed = [];
 
 	vipgoci_log(
 		'Removing comments to be ignored from results before submission',
-		array(
-			'messages-ignore' =>
-				$options['review-comments-ignore'],
-		)
+		[
+			'messages-ignore' => $options['review-comments-ignore'],
+		]
 	);
 
-
-	foreach(
-		$results['issues'] as
-			$pr_number => $pr_issues_comments
+	foreach (
+		$results['issues'] as $pr_number => $pr_issues_comments
 	) {
-		foreach(
-			$pr_issues_comments as
-				$pr_issue_key =>
-				$pr_issue
+		foreach (
+			$pr_issues_comments as $pr_issue_key => $pr_issue
 		) {
 			if ( in_array(
 				strtolower(
@@ -742,47 +580,26 @@ function vipgoci_results_filter_ignorable(
 				 * remove it from the results-array.
 				 */
 				unset(
-					$results[
-						'issues'
-					][
-						$pr_number
-					][
-						$pr_issue_key
-					]
+					$results['issues'][ $pr_number ][ $pr_issue_key ]
 				);
 
 				/*
 				 * Keep track of what we remove
 				 */
 				if ( ! isset(
-					$comments_removed[
-						$pr_number
-					]
+					$comments_removed[ $pr_number ]
 				) ) {
-					$comments_removed[
-						$pr_number
-					] = array();
+					$comments_removed[ $pr_number ] = [];
 				}
 
-				$comments_removed[
-					$pr_number
-				][] = $pr_issue;
-
+				$comments_removed[ $pr_number ][] = $pr_issue;
 
 				/*
 				 * Keep statistics up-to-date
 				 */
-				$results[
-					'stats'
-				][
-					$pr_issue['type']
-				][
-					$pr_number
-				][
-					strtolower(
-						$pr_issue['issue']['type']
-					)
-				]--;
+				$results['stats'][ $pr_issue['type'] ][ $pr_number ][ strtolower(
+					$pr_issue['issue']['type']
+				) ] --;
 			}
 		}
 
@@ -798,9 +615,9 @@ function vipgoci_results_filter_ignorable(
 
 	vipgoci_log(
 		'Removed ignorable comments',
-		array(
+		[
 			'comments-removed' => $comments_removed
-		)
+		]
 	);
 }
 

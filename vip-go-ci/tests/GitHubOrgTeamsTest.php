@@ -5,20 +5,21 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class GitHubOrgTeamsTest extends TestCase {
-	var $options = array(
-		'github-token'	=> null,
-		'org-name'	=> null,
-		'team-slug'	=> null,
-	);
+	var $options
+		= [
+			'github-token' => null,
+			'org-name'     => null,
+			'team-slug'    => null,
+		];
 
 	public function setUp() {
-		foreach( $this->options as $option_key => $option_value ) {
-			$this->options[ $option_key ] =
-				vipgoci_unittests_get_config_value(
-					'git-secrets',
-					$option_key,
-					true
-				);
+		foreach ( $this->options as $option_key => $option_value ) {
+			$this->options[ $option_key ]
+				= vipgoci_unittests_get_config_value(
+				'git-secrets',
+				$option_key,
+				true
+			);
 		}
 	}
 
@@ -32,11 +33,11 @@ final class GitHubOrgTeamsTest extends TestCase {
 	public function testGitHubOrgTeamsNoFiltersNoKeys() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array( ),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -47,7 +48,6 @@ final class GitHubOrgTeamsTest extends TestCase {
 
 			return;
 		}
-
 
 		/*
 		 * Test vipgoci_github_org_teams_get() without any
@@ -112,11 +112,11 @@ final class GitHubOrgTeamsTest extends TestCase {
 	public function testGitHubOrgTeamsWithFilters() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array( ),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -138,14 +138,13 @@ final class GitHubOrgTeamsTest extends TestCase {
 		$teams_res_actual = vipgoci_github_org_teams_get(
 			$this->options['github-token'],
 			$this->options['org-name'],
-			array(
+			[
 				'slug' => $this->options['team-slug']
-			),
+			],
 			null
 		);
 
 		vipgoci_unittests_output_unsuppress();
-
 
 		$this->assertNotEmpty(
 			$teams_res_actual,
@@ -173,9 +172,9 @@ final class GitHubOrgTeamsTest extends TestCase {
 		$teams_res_actual_cached = vipgoci_github_org_teams_get(
 			$this->options['github-token'],
 			$this->options['org-name'],
-			array(
+			[
 				'slug' => $this->options['team-slug']
-			),
+			],
 			null
 		);
 
@@ -196,11 +195,11 @@ final class GitHubOrgTeamsTest extends TestCase {
 	public function testGitHubOrgTeamsWithKeyes() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array( ),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -211,7 +210,6 @@ final class GitHubOrgTeamsTest extends TestCase {
 
 			return;
 		}
-
 
 		/*
 		 * Test vipgoci_github_org_teams_get() without filters but
@@ -225,9 +223,8 @@ final class GitHubOrgTeamsTest extends TestCase {
 			null,
 			'slug'
 		);
-	
-		vipgoci_unittests_output_unsuppress();
 
+		vipgoci_unittests_output_unsuppress();
 
 		$this->assertNotEmpty(
 			$teams_res_actual,
@@ -240,27 +237,20 @@ final class GitHubOrgTeamsTest extends TestCase {
 
 		$this->assertTrue(
 			isset(
-				$teams_res_actual[
-					$teams_res_actual_keys[0]
-				][0]->name
+				$teams_res_actual[ $teams_res_actual_keys[0] ][0]->name
 			)
 		);
 
 		$this->assertTrue(
 			strlen(
-				$teams_res_actual[
-					$teams_res_actual_keys[0]
-				][0]->name
+				$teams_res_actual[ $teams_res_actual_keys[0] ][0]->name
 			) > 0
 		);
 
 		$this->assertEquals(
 			$teams_res_actual_keys[0],
-			$teams_res_actual[
-				$teams_res_actual_keys[0]
-			][0]->slug
+			$teams_res_actual[ $teams_res_actual_keys[0] ][0]->slug
 		);
-
 
 		/*
 		 * Test again, now the cached version.

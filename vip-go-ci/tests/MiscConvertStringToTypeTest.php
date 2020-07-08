@@ -11,22 +11,22 @@ final class MiscConvertStringToTypeTest extends TestCase {
 	public function testConvert1() {
 		$this->assertEquals(
 			true,
-			vipgoci_convert_string_to_type('true')
+			vipgoci_convert_string_to_type( 'true' )
 		);
 
 		$this->assertEquals(
 			false,
-			vipgoci_convert_string_to_type('false')
+			vipgoci_convert_string_to_type( 'false' )
 		);
 
 		$this->assertEquals(
 			null,
-			vipgoci_convert_string_to_type('null')
+			vipgoci_convert_string_to_type( 'null' )
 		);
 
 		$this->assertEquals(
 			'somestring',
-			vipgoci_convert_string_to_type('somestring')
+			vipgoci_convert_string_to_type( 'somestring' )
 		);
 	}
 }

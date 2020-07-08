@@ -5,26 +5,13 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class MiscPatchChangedLinesTest extends TestCase {
-	var $github_config = array(
-		'repo-owner'	=> null,
-		'repo-name'	=> null,
-		'pr-base-sha'	=> null,
-		'commit-id'	=> null,
-	);
-
-	protected function setUp() {
-		vipgoci_unittests_get_config_values(
-			'patch-changed-lines',
-			$this->github_config
-		);
-
-		$this->github_config[ 'github-token' ] =
-			vipgoci_unittests_get_config_value(
-				'git-secrets',
-				'github-token',
-				true // Fetch from secrets file
-			);
-	}
+	var $github_config
+		= [
+			'repo-owner'  => null,
+			'repo-name'   => null,
+			'pr-base-sha' => null,
+			'commit-id'   => null,
+		];
 
 	/**
 	 * @covers ::vipgoci_patch_changed_lines
@@ -32,11 +19,11 @@ final class MiscPatchChangedLinesTest extends TestCase {
 	public function testPatchChangedLines1() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->github_config,
-			array( 'github-token' ),
+			[ 'github-token' ],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -67,6 +54,20 @@ final class MiscPatchChangedLinesTest extends TestCase {
 				true
 			),
 			$patch_arr
+		);
+	}
+
+	protected function setUp() {
+		vipgoci_unittests_get_config_values(
+			'patch-changed-lines',
+			$this->github_config
+		);
+
+		$this->github_config['github-token']
+			= vipgoci_unittests_get_config_value(
+			'git-secrets',
+			'github-token',
+			true // Fetch from secrets file
 		);
 	}
 }

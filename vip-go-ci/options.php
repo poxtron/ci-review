@@ -10,34 +10,29 @@ function vipgoci_options_read_repo_file(
 	$repo_options_file_name,
 	$options_overwritable
 ) {
-
-	if ( false === $options[ 'repo-options' ] ) {
+	if ( false === $options['repo-options'] ) {
 		vipgoci_log(
-			'Skipping possibly overwriting options ' .
-				'using data from repository settings file ' .
-				'as this is disabled via command-line options',
-			array(
-				'repo-options'
-					=> $options[ 'repo-options' ],
-			)
+			'Skipping possibly overwriting options ' . 'using data from repository settings file '
+			. 'as this is disabled via command-line options',
+			[
+				'repo-options' => $options['repo-options'],
+			]
 		);
 
 		return true;
 	}
 
 	vipgoci_log(
-		'Reading options from repository, overwriting ' .
-			'already set option values if applicable',
-		array(
-			'repo_owner'		=> $options['repo-owner'],
-			'repo_name'		=> $options['repo-name'],
-			'commit'		=> $options['commit'],
-			'filename'		=> $repo_options_file_name,
-			'options_overwritable'	=> $options_overwritable,
-			'repo_options_allowed'	=> $options['repo-options-allowed'],
-		)
+		'Reading options from repository, overwriting ' . 'already set option values if applicable',
+		[
+			'repo_owner'           => $options['repo-owner'],
+			'repo_name'            => $options['repo-name'],
+			'commit'               => $options['commit'],
+			'filename'             => $repo_options_file_name,
+			'options_overwritable' => $options_overwritable,
+			'repo_options_allowed' => $options['repo-options-allowed'],
+		]
 	);
-
 
 	/*
 	 * Try to read options-file from
@@ -56,9 +51,9 @@ function vipgoci_options_read_repo_file(
 	if ( false === $repo_options_file_contents ) {
 		vipgoci_log(
 			'No options found in repository settings-file, nothing further to do',
-			array(
+			[
 				'filename' => $repo_options_file_name,
-			)
+			]
 		);
 
 		return false;
@@ -72,52 +67,40 @@ function vipgoci_options_read_repo_file(
 	if ( null === $repo_options_arr ) {
 		vipgoci_log(
 			'Options not parsable, nothing further to do',
-			array(
-				'filename'
-					=> $repo_options_file_name,
+			[
+				'filename' => $repo_options_file_name,
 
-				'repo_options_arr'
-					=> $repo_options_arr,
+				'repo_options_arr' => $repo_options_arr,
 
-				'repo_options_file_contents'
-					=> $repo_options_file_contents,
+				'repo_options_file_contents' => $repo_options_file_contents,
 
-				'repo_options_allowed'
-					=> $options['repo-options-allowed'],
-			)
+				'repo_options_allowed' => $options['repo-options-allowed'],
+			]
 		);
 
 		return false;
 	}
 
-
 	/*
 	 * Actually set/overwrite values. Keep account of what we set
 	 * and to what value, log it at the end.
 	 */
-	$options_read = array();
+	$options_read = [];
 
-	foreach(
-		$options_overwritable as
-			$option_overwritable_name =>
-			$option_overwritable_conf
+	foreach (
+		$options_overwritable as $option_overwritable_name => $option_overwritable_conf
 	) {
 		/*
 		 * Detect possible issues with
 		 * the arguments given, or value not defined
 		 * in the options-file.
 		 */
-		if (
-			( ! isset(
-				$repo_options_arr[
-					$option_overwritable_name
-				]
+		if ( ( ! isset(
+				$repo_options_arr[ $option_overwritable_name ]
 			) )
-			||
-			( ! isset(
+		     || ( ! isset(
 				$option_overwritable_conf['type']
-			) )
-		) {
+			) ) ) {
 			continue;
 		}
 
@@ -126,12 +109,10 @@ function vipgoci_options_read_repo_file(
 		 * be in place for all options, except ones
 		 * dealing with arrays.
 		 */
-		if (
-			( 'array' !== $option_overwritable_conf['type'] ) &&
-			( ! isset(
+		if ( ( 'array' !== $option_overwritable_conf['type'] )
+		     && ( ! isset(
 				$option_overwritable_conf['valid_values']
-			) )
-		) {
+			) ) ) {
 			continue;
 		}
 
@@ -147,7 +128,7 @@ function vipgoci_options_read_repo_file(
 
 		/*
 		 * Limit which options are configurable via repository
-		 * options file. Skip the current option if not found 
+		 * options file. Skip the current option if not found
 		 * the list of allowed options.
 		 */
 		if ( ! in_array(
@@ -156,134 +137,85 @@ function vipgoci_options_read_repo_file(
 			true
 		) ) {
 			vipgoci_log(
-				'Found option to be configured that cannot ' .
-					'be configured via repository ' .
-					'options file, skipping',
-				array(
-					'option_overwritable_name'
-						=> $option_overwritable_name,
+				'Found option to be configured that cannot ' . 'be configured via repository ' . 'options file, skipping',
+				[
+					'option_overwritable_name' => $option_overwritable_name,
 
-					'option_overwritable_conf'
-						=> $option_overwritable_conf,
+					'option_overwritable_conf' => $option_overwritable_conf,
 
-					'repo_options_arr[' . $option_overwritable_name .' ]'
-						=> $repo_options_arr[ $option_overwritable_name ],
+					'repo_options_arr[' . $option_overwritable_name . ' ]' => $repo_options_arr[ $option_overwritable_name ],
 
-					'repo_options_allowed'
-						=> $options['repo-options-allowed'],
-				)
+					'repo_options_allowed' => $options['repo-options-allowed'],
+				]
 			);
 
 			continue;
 		}
-	
+
 		$do_skip = false;
 
 		if ( 'integer' === $option_overwritable_conf['type'] ) {
-			if ( ! is_numeric( $repo_options_arr[
-					$option_overwritable_name
-				]
+			if ( ! is_numeric(
+				$repo_options_arr[ $option_overwritable_name ]
 			) ) {
 				$do_skip = true;
-			}
-
-			else if ( ! in_array(
-				$repo_options_arr[
-					$option_overwritable_name
-				],
+			} elseif ( ! in_array(
+				$repo_options_arr[ $option_overwritable_name ],
 				$option_overwritable_conf['valid_values'],
 				true
 			) ) {
 				$do_skip = true;
 			}
-		}
-
-		else if ( 'boolean' === $option_overwritable_conf['type'] ) {
+		} elseif ( 'boolean' === $option_overwritable_conf['type'] ) {
 			if ( ! is_bool(
-				$repo_options_arr[
-					$option_overwritable_name
-				]
+				$repo_options_arr[ $option_overwritable_name ]
 			) ) {
 				$do_skip = true;
-			}
-
-			else if ( ! in_array(
-				$repo_options_arr[
-					$option_overwritable_name
-				],
+			} elseif ( ! in_array(
+				$repo_options_arr[ $option_overwritable_name ],
 				$option_overwritable_conf['valid_values'],
 				true
 			) ) {
 				$do_skip = true;
 			}
-		}
-
-		else if ( 'array' === $option_overwritable_conf['type'] ) {
+		} elseif ( 'array' === $option_overwritable_conf['type'] ) {
 			if ( ! is_array(
-				$repo_options_arr[
-					$option_overwritable_name
-				]
+				$repo_options_arr[ $option_overwritable_name ]
 			) ) {
 				$do_skip = true;
 			}
-		}
-
-		else {
+		} else {
 			$do_skip = true;
 		}
-
 
 		if ( true === $do_skip ) {
 			vipgoci_log(
 				'Found invalid value for option in option-file, or invalid arguments passed internally',
-				array(
-					'option_overwritable_name'
-						=> $option_overwritable_name,
+				[
+					'option_overwritable_name' => $option_overwritable_name,
 
-					'option_overwritable_conf'
-						=> $option_overwritable_conf,
+					'option_overwritable_conf' => $option_overwritable_conf,
 
-					'repo_options_arr[' . $option_overwritable_name .' ]'
-						=> $repo_options_arr[ $option_overwritable_name ],
-				)
+					'repo_options_arr[' . $option_overwritable_name . ' ]' => $repo_options_arr[ $option_overwritable_name ],
+				]
 			);
 
 			continue;
 		}
 
-		if (
-			( 'array' === $option_overwritable_conf['type'] ) && 
-			( true === $option_overwritable_conf['append'] )
-		) {
-			$options[
-				$option_overwritable_name
-			] = array_merge(
-				$options[
-					$option_overwritable_name
-				],
-				$repo_options_arr[
-					$option_overwritable_name
-				]
+		if ( ( 'array' === $option_overwritable_conf['type'] )
+		     && ( true === $option_overwritable_conf['append'] ) ) {
+			$options[ $option_overwritable_name ] = array_merge(
+				$options[ $option_overwritable_name ],
+				$repo_options_arr[ $option_overwritable_name ]
 			);
+		} else {
+			$options[ $option_overwritable_name ]
+				= $repo_options_arr[ $option_overwritable_name ];
 		}
 
-		else {
-			$options[
-				$option_overwritable_name
-			]
-			=
-			$repo_options_arr[
-				$option_overwritable_name
-			];
-		}
-
-		$options_read[
-			$option_overwritable_name
-		]
-		=
-		$repo_options_arr[
-			$option_overwritable_name
-		];
+		$options_read[ $option_overwritable_name ]
+			= $repo_options_arr[ $option_overwritable_name ];
 	}
 
 	vipgoci_log(
@@ -303,8 +235,8 @@ function vipgoci_options_read_repo_file(
 function vipgoci_options_read_repo_skip_files(
 	&$options
 ) {
-	foreach(
-		array( 'phpcs', 'lint' ) as $scan_type
+	foreach (
+		[ 'phpcs', 'lint' ] as $scan_type
 	) {
 		/*
 		 * If not configured to read
@@ -312,47 +244,42 @@ function vipgoci_options_read_repo_skip_files(
 		 */
 		if ( true !== $options[ $scan_type . '-skip-folders-in-repo-options-file' ] ) {
 			vipgoci_log(
-				'Not reading from repository files which ' .
-				$scan_type . ' folders can be skipped, as not ' .
-				'configured to do so',
-				array(
-					$scan_type . '_skip_folders_in_repo_options_file'	=>
-						$options[ $scan_type . '-skip-folders-in-repo-options-file' ]
-				)
+				'Not reading from repository files which ' . $scan_type . ' folders can be skipped, as not ' . 'configured to do so',
+				[
+					$scan_type . '_skip_folders_in_repo_options_file' => $options[ $scan_type . '-skip-folders-in-repo-options-file' ]
+				]
 			);
 
 			continue;
 		}
-	
+
 		vipgoci_log(
-			'Reading from repository files which folders can ' .
-				'be skipped from ' . $scan_type . ' scanning',
-			array(
-				$scan_type . '_skip_folders_in_repo_options_file'	=>
-					$options[ $scan_type . '-skip-folders-in-repo-options-file' ]
-			)
+			'Reading from repository files which folders can ' . 'be skipped from ' . $scan_type . ' scanning',
+			[
+				$scan_type . '_skip_folders_in_repo_options_file' => $options[ $scan_type . '-skip-folders-in-repo-options-file' ]
+			]
 		);
 
 		$type_options_file_name = '.vipgoci_' . $scan_type . '_skip_folders';
 
-		$type_options_file_contents =
-			vipgoci_gitrepo_fetch_committed_file(
-				$options['repo-owner'],
-				$options['repo-name'],
-				$options['token'],
-				$options['commit'],
-				$type_options_file_name,
-				$options['local-git-repo']
-			);
+		$type_options_file_contents
+			= vipgoci_gitrepo_fetch_committed_file(
+			$options['repo-owner'],
+			$options['repo-name'],
+			$options['token'],
+			$options['commit'],
+			$type_options_file_name,
+			$options['local-git-repo']
+		);
 
 		if ( empty(
-			$type_options_file_contents
+		$type_options_file_contents
 		) ) {
 			vipgoci_log(
 				'No folders skippable found in repository for ' . $scan_type . ', so skipping',
-				array(
-					'type_options_file_name'	=> $type_options_file_name,
-				)
+				[
+					'type_options_file_name' => $type_options_file_name,
+				]
 			);
 
 			continue;
@@ -363,13 +290,13 @@ function vipgoci_options_read_repo_skip_files(
 		 * new-lines as separators
 		 * between items. Here we
 		 * emulate the behaviour
-	 	 * found on the command-line,
+		  * found on the command-line,
 		 * which is to use commas.
 		 */
-		$type_options_file_contents =
-			str_replace(
-				"\n",
-				',',
+		$type_options_file_contents
+			= str_replace(
+			"\n",
+			',',
 			$type_options_file_contents
 		);
 
@@ -381,10 +308,9 @@ function vipgoci_options_read_repo_skip_files(
 		 * file.
 		 */
 
-		$tmp_options = array(
-			'tmp-skip-folders' =>
-				$type_options_file_contents
-		);
+		$tmp_options = [
+			'tmp-skip-folders' => $type_options_file_contents
+		];
 
 		/*
 		 * Use standard function to
@@ -410,45 +336,31 @@ function vipgoci_options_read_repo_skip_files(
 		 * join it with any existing
 		 * folders.
 		 */
-		if (
-			( is_array(
-				$tmp_options[
-					'tmp-skip-folders'
-				]
+		if ( ( is_array(
+				$tmp_options['tmp-skip-folders']
 			) )
-			&&
-			( count(
-				$tmp_options[
-					'tmp-skip-folders'
-				]
-			) > 0 )
-		) {
-
-			$log_msg = 'Merging folders found in configuration ' .
-					'file with possible other folders';
+		     && ( count(
+			          $tmp_options['tmp-skip-folders']
+		          ) > 0 ) ) {
+			$log_msg = 'Merging folders found in configuration ' . 'file with possible other folders';
 
 			$options[ $scan_type . '-skip-folders' ] = array_merge(
-				$options[ $scan_type . '-skip-folders'],
+				$options[ $scan_type . '-skip-folders' ],
 				$tmp_options['tmp-skip-folders']
 			);
-		}
-
-		else {
+		} else {
 			$log_msg = 'No folders found to merge with options, skipping';
 		}
 
 		vipgoci_log(
 			$log_msg,
-			array(
-				'scan_type'
-					=> $scan_type,
+			[
+				'scan_type' => $scan_type,
 
-				'file_options_' . $scan_type . '_skip_folders' =>
-					$tmp_options['tmp-skip-folders'],
+				'file_options_' . $scan_type . '_skip_folders' => $tmp_options['tmp-skip-folders'],
 
-				'current_' . $scan_type . '_skip_folders' =>
-					$options[ $scan_type . '-skip-folders'],
-			)
+				'current_' . $scan_type . '_skip_folders' => $options[ $scan_type . '-skip-folders' ],
+			]
 		);
 
 		unset( $tmp_options );
@@ -465,22 +377,21 @@ function vipgoci_options_read_env(
 	&$options,
 	$options_recognized
 ) {
-
 	if ( ! isset( $options['env-options'] ) ) {
 		return;
 	}
 
 	vipgoci_log(
 		'Attempting to read configuration from environmental variables',
-		array(
-			'env-options' => $options['env-options'],
+		[
+			'env-options'        => $options['env-options'],
 			'options-recognized' => $options_recognized,
-		)
+		]
 	);
 
-	$options_configured = array();
+	$options_configured = [];
 
-	foreach(
+	foreach (
 		$options['env-options'] as $option_unparsed
 	) {
 		/*
@@ -497,39 +408,34 @@ function vipgoci_options_read_env(
 		if ( count( $option_parsed ) !== 2 ) {
 			vipgoci_log(
 				'Invalid option provided via environment, skipping',
-				array(
-					'option_parsed'	=> $option_parsed,
-				)
+				[
+					'option_parsed' => $option_parsed,
+				]
 			);
 
 			continue;
 		}
 
-		$option_name = $option_parsed[0];
+		$option_name    = $option_parsed[0];
 		$option_env_var = $option_parsed[1];
 		unset( $option_parsed );
 
 		/*
 		 * If option-name or env-var is too short, skip.
 		 */
-		if (
-			( strlen(
-				$option_name
-			) < 1 )
-			||
-			( strlen(
-				$option_env_var
-			) < 1 )
-		) {
+		if ( ( strlen(
+			       $option_name
+		       ) < 1 )
+		     || ( strlen(
+			          $option_env_var
+		          ) < 1 ) ) {
 			vipgoci_log(
 				'Skipping option name/var-name from environment as it is too short',
-				array(
-					'option_name' =>
-						$option_name,
+				[
+					'option_name' => $option_name,
 
-					'option_env_var' =>
-						$option_env_var,
-				)
+					'option_env_var' => $option_env_var,
+				]
 			);
 
 			continue;
@@ -545,16 +451,13 @@ function vipgoci_options_read_env(
 		) ) {
 			vipgoci_log(
 				'Skipping option from environment as it is not recognized',
-				array(
-					'option_name' => 
-						$option_name,
+				[
+					'option_name' => $option_name,
 
-					'option_env_var' =>
-						$option_env_var,
+					'option_env_var' => $option_env_var,
 
-					'options_recognized' =>
-						$options_recognized,
-				)
+					'options_recognized' => $options_recognized,
+				]
 			);
 
 			continue;
@@ -565,17 +468,15 @@ function vipgoci_options_read_env(
 		 */
 		if ( in_array(
 			$option_name,
-			array( 'env-options' )
+			[ 'env-options' ]
 		) ) {
 			vipgoci_log(
 				'Skipping option from environment as it is not allowed',
-				array(
-					'option_name' =>
-						$option_name,
+				[
+					'option_name' => $option_name,
 
-					'option_env_var' =>
-						$option_env_var,
-				)
+					'option_env_var' => $option_env_var,
+				]
 			);
 
 			continue;
@@ -586,28 +487,19 @@ function vipgoci_options_read_env(
 		 * configured by us in an earlier
 		 * round? Then skip.
 		 */
-		if (
-			( isset(
-				$options[
-					$option_name
-				]
+		if ( ( isset(
+				$options[ $option_name ]
 			) )
-			&&
-			( ! isset(
-				$options_configured[
-					$option_name
-				]
-			) )
-		) {
+		     && ( ! isset(
+				$options_configured[ $option_name ]
+			) ) ) {
 			vipgoci_log(
 				'Skipping option from environment as it is already configured',
-				array(
-					'option_name' =>
-						$option_name,
+				[
+					'option_name' => $option_name,
 
-					'option_env_var'
-						=> $option_env_var,
-				)
+					'option_env_var' => $option_env_var,
+				]
 			);
 
 			continue;
@@ -621,16 +513,13 @@ function vipgoci_options_read_env(
 		if ( false === $option_env_var_value ) {
 			vipgoci_log(
 				'Skipping option from environment as the variable is not defined',
-				array(
-					'option_name' =>
-						$option_name,
+				[
+					'option_name' => $option_name,
 
-					'option_env_var' =>
-						$option_env_var,
+					'option_env_var' => $option_env_var,
 
-					'option_env_var_value' =>
-						$option_env_var_value,
-				)
+					'option_env_var_value' => $option_env_var_value,
+				]
 			);
 
 			continue;
@@ -640,26 +529,21 @@ function vipgoci_options_read_env(
 		 * All checks passed.
 		 * Actually set value.
 		 */
-		$options[
-			$option_name
-		] = $option_env_var_value;
+		$options[ $option_name ] = $option_env_var_value;
 
-		$options_configured[
-			$option_name
-		] = $option_env_var_value;
+		$options_configured[ $option_name ] = $option_env_var_value;
 	}
 
 	vipgoci_log(
 		'Read and set options from environment',
-		array(
+		[
 			/*
 			 * Note: Do not print out the actual
 			 * values, so not to expose them in logs.
-			 */
-			'options_configured_keys' => array_keys(
-				$options_configured
-			)
+			 */ 'options_configured_keys' => array_keys(
+			$options_configured
 		)
+		]
 	);
 }
 
@@ -671,10 +555,9 @@ function vipgoci_options_read_env(
  */
 function vipgoci_options_sensitive_clean(
 	$options,
-	$options_add_to_sensitive = array()
+	$options_add_to_sensitive = []
 ) {
-	static $sensitive_options = array(
-	);
+	static $sensitive_options = [];
 
 	if ( ! empty ( $options_add_to_sensitive ) ) {
 		$sensitive_options = array_merge(
@@ -687,9 +570,8 @@ function vipgoci_options_sensitive_clean(
 
 	$options_clean = $options;
 
-	foreach(
-		$options_clean as
-			$option_key => $option_value
+	foreach (
+		$options_clean as $option_key => $option_value
 	) {
 		if ( ! in_array(
 			$option_key,
@@ -704,7 +586,7 @@ function vipgoci_options_sensitive_clean(
 		}
 
 		$options_clean[ $option_key ] = '***';
-	}	
+	}
 
 	return $options_clean;
 }
@@ -723,21 +605,17 @@ function vipgoci_option_bool_handle(
 	$parameter_name,
 	$default_value
 ) {
-
 	/* If no default is given, set it */
 	if ( ! isset( $options[ $parameter_name ] ) ) {
 		$options[ $parameter_name ] = $default_value;
 	}
 
 	/* Check if the gien value is a false or true */
-	if (
-		( $options[ $parameter_name ] !== 'false' ) &&
-		( $options[ $parameter_name ] !== 'true' )
-	) {
+	if ( ( $options[ $parameter_name ] !== 'false' )
+	     && ( $options[ $parameter_name ] !== 'true' ) ) {
 		vipgoci_sysexit(
-			'Parameter --' . $parameter_name .
-				' has to be either false or true',
-			array(),
+			'Parameter --' . $parameter_name . ' has to be either false or true',
+			[],
 			VIPGOCI_EXIT_USAGE_ERROR
 		);
 	}
@@ -745,9 +623,7 @@ function vipgoci_option_bool_handle(
 	/* Convert the given value to a boolean type value */
 	if ( $options[ $parameter_name ] === 'false' ) {
 		$options[ $parameter_name ] = false;
-	}
-
-	else {
+	} else {
 		$options[ $parameter_name ] = true;
 	}
 }
@@ -777,38 +653,32 @@ function vipgoci_option_integer_handle(
 	/* Make sure it is a numeric */
 	if ( ! is_numeric( $options[ $parameter_name ] ) ) {
 		vipgoci_sysexit(
-			'Usage: Parameter --' . $parameter_name . ' is not ' .
-				'an integer-value.',
-			array(),
+			'Usage: Parameter --' . $parameter_name . ' is not ' . 'an integer-value.',
+			[],
 			VIPGOCI_EXIT_USAGE_ERROR
 		);
 	}
 
 	/* Forcibly convert to integer-value */
-	$options[ $parameter_name ] =
-		(int) $options[ $parameter_name ];
+	$options[ $parameter_name ]
+		= (int) $options[ $parameter_name ];
 
 	/*
 	 * Check if value is in range
 	 */
 
-	if (
-		( null !== $allowed_values )
-		&&
-		( ! in_array(
+	if ( ( null !== $allowed_values )
+	     && ( ! in_array(
 			$options[ $parameter_name ],
 			$allowed_values,
 			true
-		) )
-	) {
+		) ) ) {
 		vipgoci_sysexit(
-			'Parameter --' . $parameter_name . ' is out ' .
-				'of allowable range.',
-			array(),
+			'Parameter --' . $parameter_name . ' is out ' . 'of allowable range.',
+			[],
 			VIPGOCI_EXIT_USAGE_ERROR
 		);
 	}
-
 }
 
 /*
@@ -824,35 +694,26 @@ function vipgoci_option_integer_handle(
 function vipgoci_option_array_handle(
 	&$options,
 	$option_name,
-	$default_value = array(),
+	$default_value = [],
 	$forbidden_value = null,
 	$array_separator = ',',
 	$strlower_option_value = true
 ) {
 	if ( ! isset( $options[ $option_name ] ) ) {
 		$options[ $option_name ] = $default_value;
-	}
-
-	/*
+	} /*
 	 * Detect when option is already
 	 * array, which can happen when
 	 * an option is specified twice.
-	 */
-	else if ( is_array(
+	 */ elseif ( is_array(
 		$options[ $option_name ]
 	) ) {
 		vipgoci_sysexit(
-			'Parameter --' .
-			$option_name . ' ' .
-			'is an array -- ' .
-			'should be a string. ' .
-			'Is it specified twice?',
-			array(),
+			'Parameter --' . $option_name . ' ' . 'is an array -- ' . 'should be a string. ' . 'Is it specified twice?',
+			[],
 			VIPGOCI_EXIT_USAGE_ERROR
 		);
-	}
-
-	else {
+	} else {
 		if ( true === $strlower_option_value ) {
 			$options[ $option_name ] = strtolower(
 				$options[ $option_name ]
@@ -871,20 +732,14 @@ function vipgoci_option_array_handle(
 				true
 			) ) {
 				vipgoci_sysexit(
-					'Parameter --' .
-						$option_name . ' ' .
-						'can not contain \'' .
-						$forbidden_value .
-						'\' as one of ' .
-						'the values',
-					array(),
+					'Parameter --' . $option_name . ' ' . 'can not contain \'' . $forbidden_value . '\' as one of ' . 'the values',
+					[],
 					VIPGOCI_EXIT_USAGE_ERROR
 				);
 			}
 		}
 	}
 }
-
 
 /*
  * Handle parameter that expects the value
@@ -897,22 +752,14 @@ function vipgoci_option_file_handle(
 	$option_name,
 	$default_value = null
 ) {
-
-	if (
-		( ! isset( $options[ $option_name ] ) ) &&
-		( null !== $default_value )
-	) {
+	if ( ( ! isset( $options[ $option_name ] ) )
+	     && ( null !== $default_value ) ) {
 		$options[ $option_name ] = $default_value;
-	}
-
-	else if (
-		( ! isset( $options[ $option_name ] ) ) ||
-		( ! is_file( $options[ $option_name ] ) )
-	) {
+	} elseif ( ( ! isset( $options[ $option_name ] ) )
+	           || ( ! is_file( $options[ $option_name ] ) ) ) {
 		vipgoci_sysexit(
-			'Parameter --' . $option_name .
-				' has to be a valid path',
-			array(),
+			'Parameter --' . $option_name . ' has to be a valid path',
+			[],
 			VIPGOCI_EXIT_USAGE_ERROR
 		);
 	}
@@ -936,10 +783,8 @@ function vipgoci_option_url_handle(
 	/*
 	 * If not set, assume default value.
 	 */
-	if (
-		( ! isset( $options[ $option_name ] ) ) ||
-		( empty( $options[ $option_name ] ) )
-	) {
+	if ( ( ! isset( $options[ $option_name ] ) )
+	     || ( empty( $options[ $option_name ] ) ) ) {
 		$options[ $option_name ] = $default_value;
 	}
 
@@ -952,22 +797,17 @@ function vipgoci_option_url_handle(
 			$options[ $option_name ]
 		);
 
-		if (
-			( 0 !== strpos(
-				$options[ $option_name ],
-				'http://'
-			) )
-			&&
-			( 0 !== strpos(
-				$options[ $option_name ],
-				'https://'
-			) )
-		) {
+		if ( ( 0 !== strpos(
+					$options[ $option_name ],
+					'http://'
+				) )
+		     && ( 0 !== strpos(
+					$options[ $option_name ],
+					'https://'
+				) ) ) {
 			vipgoci_sysexit(
-				'Option --' . $option_name . ' should ' .
-					'be an URL',
-				array(
-				),
+				'Option --' . $option_name . ' should ' . 'be an URL',
+				[],
 				VIPGOCI_EXIT_USAGE_ERROR
 			);
 		}
@@ -987,11 +827,9 @@ function vipgoci_option_teams_handle(
 	&$options,
 	$option_name
 ) {
-	if (
-		( ! isset( $options[ $option_name ] ) ) ||
-		( ! is_array( $options[ $option_name ] ) )
-	) {
-		$options[ $option_name ] = array();
+	if ( ( ! isset( $options[ $option_name ] ) )
+	     || ( ! is_array( $options[ $option_name ] ) ) ) {
+		$options[ $option_name ] = [];
 	}
 
 	if ( empty( $options[ $option_name ] ) ) {
@@ -1003,7 +841,6 @@ function vipgoci_option_teams_handle(
 		$options[ $option_name ]
 	);
 
-
 	$teams_info = vipgoci_github_org_teams_get(
 		$options['token'],
 		$options['repo-owner'],
@@ -1011,9 +848,8 @@ function vipgoci_option_teams_handle(
 		'slug'
 	);
 
-	foreach(
-		$options[ $option_name ] as
-			$team_id_key =>	$team_id_value
+	foreach (
+		$options[ $option_name ] as $team_id_key => $team_id_value
 	) {
 		$team_id_value_original = $team_id_value;
 
@@ -1021,10 +857,8 @@ function vipgoci_option_teams_handle(
 		 * If a string, transform team_id_value into integer ID
 		 * for team.
 		 */
-		if (
-			( ! is_numeric( $team_id_value ) ) &&
-			( ! empty( $teams_info[ $team_id_value ] ) )
-		) {
+		if ( ( ! is_numeric( $team_id_value ) )
+		     && ( ! empty( $teams_info[ $team_id_value ] ) ) ) {
 			$team_id_value = $teams_info[ $team_id_value ][0]->id;
 		}
 
@@ -1035,11 +869,10 @@ function vipgoci_option_teams_handle(
 		 */
 		if ( is_numeric( $team_id_value ) ) {
 			$options
-				[ $option_name ]
-				[ $team_id_key ] = (int) $team_id_value;
-		}
-
-		/*
+			[ $option_name ]
+			[ $team_id_key ]
+				= (int) $team_id_value;
+		} /*
 		 * Something failed; we might have
 		 * failed to transform $team_id_value into
 		 * a numeric representation (ID) and/or
@@ -1049,35 +882,34 @@ function vipgoci_option_teams_handle(
 
 		else {
 			vipgoci_log(
-				'Invalid team ID found in ' .
-				'--' . $option_name .
-				' parameter; ignoring it.',
-				array(
-					'team_id' => $team_id_value,
+				'Invalid team ID found in ' . '--' . $option_name . ' parameter; ignoring it.',
+				[
+					'team_id'          => $team_id_value,
 					'team_id_original' => $team_id_value_original,
-				)
+				]
 			);
 
 			unset(
 				$options
-					[ $option_name ]
-					[ $team_id_key ]
+				[ $option_name ]
+				[ $team_id_key ]
 			);
 		}
 	}
 
 	/* Reconstruct array from the previous one */
-	$options[ $option_name ] =
-		array_values( array_unique(
+	$options[ $option_name ]
+		= array_values(
+		array_unique(
 			$options[ $option_name ]
-		) );
+		)
+	);
 
 	unset( $teams_info );
 	unset( $team_id_key );
 	unset( $team_id_value );
 	unset( $team_id_value_original );
 }
-
 
 /*
  * Handles --skip-folder like parameters;
@@ -1088,12 +920,12 @@ function vipgoci_option_teams_handle(
 */
 function vipgoci_option_skip_folder_handle(
 	&$options,
-	$option_name	
+	$option_name
 ) {
 	vipgoci_option_array_handle(
 		$options,
 		$option_name,
-		array(),
+		[],
 		null,
 		',',
 		false // no strtolower
@@ -1104,17 +936,13 @@ function vipgoci_option_skip_folder_handle(
 	 * and end of each element, as they
 	 * should be treated as relative paths.
 	 */
-	$options[
-		$option_name
-	] = array_map(
-		function( $skip_folder_item ) {
+	$options[ $option_name ] = array_map(
+		function ( $skip_folder_item ) {
 			return trim(
 				$skip_folder_item,
 				'/'
 			);
 		},
-		$options[
-			$option_name
-		]
+		$options[ $option_name ]
 	);
 }

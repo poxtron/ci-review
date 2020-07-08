@@ -5,28 +5,29 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class VipgociOptionsTeamsTest extends TestCase {
-	var $options = array(
-		'github-token'	=> null,
-		'team-id'	=> null,
-		'team-slug'	=> null,
-		'org-name'	=> null,
-	);
+	var $options
+		= [
+			'github-token' => null,
+			'team-id'      => null,
+			'team-slug'    => null,
+			'org-name'     => null,
+		];
 
 	public function setUp() {
-		foreach( $this->options as $option_key => $option_value ) {
-			$this->options[ $option_key ] =
-				vipgoci_unittests_get_config_value(
-					'git-secrets',
-					$option_key,
-					true
-				);
+		foreach ( $this->options as $option_key => $option_value ) {
+			$this->options[ $option_key ]
+				= vipgoci_unittests_get_config_value(
+				'git-secrets',
+				$option_key,
+				true
+			);
 		}
 
-		$this->options['repo-owner'] =
-			$this->options['org-name'];
+		$this->options['repo-owner']
+			= $this->options['org-name'];
 
-		$this->options['token'] =
-			$this->options['github-token'];
+		$this->options['token']
+			= $this->options['github-token'];
 	}
 
 	public function tearDown() {
@@ -39,11 +40,11 @@ final class VipgociOptionsTeamsTest extends TestCase {
 	public function testVipgociOptionTeams1() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array( ),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -55,11 +56,10 @@ final class VipgociOptionsTeamsTest extends TestCase {
 			return;
 		}
 
-
-		$this->options['my-team-option'] = array(
+		$this->options['my-team-option'] = [
 			$this->options['team-id'],
 			$this->options['team-slug']
-		);
+		];
 
 		vipgoci_unittests_output_suppress();
 
@@ -80,9 +80,7 @@ final class VipgociOptionsTeamsTest extends TestCase {
 				$this->options['my-team-option']
 			) > 0
 		);
-
 	}
-
 
 	/**
 	 * @covers ::vipgoci_option_teams_handle
@@ -90,11 +88,11 @@ final class VipgociOptionsTeamsTest extends TestCase {
 	public function testVipgociOptionTeams2() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array( ),
+			[],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -106,9 +104,9 @@ final class VipgociOptionsTeamsTest extends TestCase {
 			return;
 		}
 
-		$this->options['my-team-option'] = array(
+		$this->options['my-team-option'] = [
 			'IsInvalidteamId5000000XYZ',
-		);
+		];
 
 		vipgoci_unittests_output_suppress();
 

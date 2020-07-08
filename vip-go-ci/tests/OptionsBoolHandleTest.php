@@ -9,8 +9,7 @@ final class VipgociOptionsBoolHandleTest extends TestCase {
 	 * @covers ::vipgoci_option_bool_handle
 	 */
 	public function testOptionsBoolHandle1() {
-		$options = array(
-		);
+		$options = [];
 
 		vipgoci_option_bool_handle(
 			$options,
@@ -23,13 +22,14 @@ final class VipgociOptionsBoolHandleTest extends TestCase {
 			$options['mytestoption']
 		);
 	}
+
 	/**
 	 * @covers ::vipgoci_option_bool_handle
 	 */
 	public function testOptionsBoolHandle2() {
-		$options = array(
+		$options = [
 			'mytestoption' => 'false',
-		);
+		];
 
 		vipgoci_option_bool_handle(
 			$options,
@@ -47,9 +47,9 @@ final class VipgociOptionsBoolHandleTest extends TestCase {
 	 * @covers ::vipgoci_option_bool_handle
 	 */
 	public function testOptionsBoolHandle3() {
-		$options = array(
+		$options = [
 			'mytestoption' => 'true',
-		);
+		];
 
 		vipgoci_option_bool_handle(
 			$options,

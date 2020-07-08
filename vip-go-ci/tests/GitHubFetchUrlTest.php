@@ -29,6 +29,6 @@ final class GitHubFetchUrlTest extends TestCase {
 			isset(
 				$ret->resources->core->remaining
 			)
-		);		
+		);
 	}
 }

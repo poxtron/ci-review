@@ -11,22 +11,20 @@
  */
 
 function vipgoci_ap_nonfunctional_changes(
-		$options,
-		&$auto_approved_files_arr
-	) {
-
+	$options,
+	&$auto_approved_files_arr
+) {
 	vipgoci_runtime_measure( VIPGOCI_RUNTIME_START, 'ap_nonfunctional_changes' );
 
 	vipgoci_log(
 		'Doing auto-approval of PHP files with non-functional changes',
-		array(
-			'repo_owner'	=> $options['repo-owner'],
-			'repo_name'	=> $options['repo-name'],
-			'commit_id'	=> $options['commit'],
-			'autoapprove'	=> $options['autoapprove'],
-		)
+		[
+			'repo_owner'  => $options['repo-owner'],
+			'repo_name'   => $options['repo-name'],
+			'commit_id'   => $options['commit'],
+			'autoapprove' => $options['autoapprove'],
+		]
 	);
-
 
 	$prs_implicated = vipgoci_github_prs_implicated(
 		$options['repo-owner'],
@@ -35,7 +33,6 @@ function vipgoci_ap_nonfunctional_changes(
 		$options['token'],
 		$options['branches-ignore']
 	);
-
 
 	foreach ( $prs_implicated as $pr_item ) {
 		$pr_diff = vipgoci_github_diffs_fetch(
@@ -57,17 +54,15 @@ function vipgoci_ap_nonfunctional_changes(
 		 * modified.
 		 */
 
-		foreach ( $pr_diff as
-			$pr_diff_file_name => $pr_diff_contents
+		foreach (
+			$pr_diff as $pr_diff_file_name => $pr_diff_contents
 		) {
 			/*
 			 * If the file is already in the array
 			 * of approved files, do not do anything.
 			 */
 			if ( isset(
-				$auto_approved_files_arr[
-					$pr_diff_file_name
-				]
+				$auto_approved_files_arr[ $pr_diff_file_name ]
 			) ) {
 				continue;
 			}
@@ -81,10 +76,10 @@ function vipgoci_ap_nonfunctional_changes(
 			 * is "php".
 			 */
 			if ( in_array(
-				$pr_diff_file_extension,
-				array( 'php' ),
-				true
-			) === false ) {
+				     $pr_diff_file_extension,
+				     [ 'php' ],
+				     true
+			     ) === false ) {
 				continue;
 			}
 
@@ -111,11 +106,11 @@ function vipgoci_ap_nonfunctional_changes(
 
 				vipgoci_log(
 					'Skipping PHP file ("old version"), as it could not be fetched from git-repository',
-					array(
-						'pr_base_sha'		=> $pr_item->base->sha,
-						'pr_diff_file_name'	=> $pr_diff_file_name,
-						'local_git_repo'	=> $options['local-git-repo'],
-					)
+					[
+						'pr_base_sha'       => $pr_item->base->sha,
+						'pr_diff_file_name' => $pr_diff_file_name,
+						'local_git_repo'    => $options['local-git-repo'],
+					]
 				);
 
 				continue;
@@ -152,16 +147,15 @@ function vipgoci_ap_nonfunctional_changes(
 
 				vipgoci_log(
 					'Skipping PHP file ("new version"), as it could not be fetched from git-repository',
-					array(
-						'commit'		=> $options['commit'],
-						'pr_diff_file_name'	=> $pr_diff_file_name,
-						'local_git_repo'	=> $options['local-git-repo'],
-					)
+					[
+						'commit'            => $options['commit'],
+						'pr_diff_file_name' => $pr_diff_file_name,
+						'local_git_repo'    => $options['local-git-repo'],
+					]
 				);
 
 				continue;
 			}
-
 
 			$tmp_file_new = vipgoci_save_temp_file(
 				$pr_diff_file_name,
@@ -179,35 +173,31 @@ function vipgoci_ap_nonfunctional_changes(
 			 * are exactly the same, given that we remove
 			 * all whitespacing changes.
 			 */
-			if (
-				sha1( php_strip_whitespace(
-					$tmp_file_old
-				) )
-				===
-				sha1( php_strip_whitespace(
-					$tmp_file_new
-				) )
-			) {
+			if ( sha1(
+				     php_strip_whitespace(
+					     $tmp_file_old
+				     )
+			     ) === sha1(
+				     php_strip_whitespace(
+					     $tmp_file_new
+				     )
+			     ) ) {
 				$log_msg = 'File is indeed functionally the same, autoapproving';
 
-				$auto_approved_files_arr[
-					$pr_diff_file_name
-				] = 'autoapprove-nonfunctional-changes';
-			}
-
-			else {
+				$auto_approved_files_arr[ $pr_diff_file_name ] = 'autoapprove-nonfunctional-changes';
+			} else {
 				$log_msg = 'File is not functionally the same, not autoapproving';
 			}
 
 			vipgoci_log(
 				$log_msg,
-				array(
-					'repo_owner'	=> $options['repo-owner'],
-					'repo_name'	=> $options['repo-name'],
-					'autoapprove'	=> $options['autoapprove'],
-					'commit_id'	=> $options['commit'],
-					'file_name'	=> $pr_diff_file_name,
-				)
+				[
+					'repo_owner'  => $options['repo-owner'],
+					'repo_name'   => $options['repo-name'],
+					'autoapprove' => $options['autoapprove'],
+					'commit_id'   => $options['commit'],
+					'file_name'   => $pr_diff_file_name,
+				]
 			);
 
 			/*

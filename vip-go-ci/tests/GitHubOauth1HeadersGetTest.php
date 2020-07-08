@@ -10,14 +10,14 @@ final class GitHubOauth1HeadersGetTest extends TestCase {
 	 */
 	public function testOAuthHeaders1() {
 		$oauth_method = 'GET';
-		$oauth_url = 'https://automattic.com';
+		$oauth_url    = 'https://automattic.com';
 
-		$oauth_keys = array(
-			'oauth_consumer_key'	=> '12',
-			'oauth_consumer_secret'	=> '34',
-			'oauth_token'		=> '56',
-			'oauth_token_secret'	=> '78',
-		);
+		$oauth_keys = [
+			'oauth_consumer_key'    => '12',
+			'oauth_consumer_secret' => '34',
+			'oauth_token'           => '56',
+			'oauth_token_secret'    => '78',
+		];
 
 		$actual_result_arr = explode(
 			', ',
@@ -29,7 +29,7 @@ final class GitHubOauth1HeadersGetTest extends TestCase {
 		);
 
 		$actual_result_arr = array_map(
-			function( $item) {
+			function ( $item ) {
 				$item_arr = explode(
 					'="',
 					$item
@@ -46,62 +46,59 @@ final class GitHubOauth1HeadersGetTest extends TestCase {
 			$actual_result_arr
 		);
 
-		$actual_result_arr_new = array();
+		$actual_result_arr_new = [];
 
-		foreach( $actual_result_arr as $item ) {
+		foreach ( $actual_result_arr as $item ) {
 			$actual_result_arr_new[ $item[0] ] = $item[1];
 		}
 
 		$this->assertEquals(
 			'12',
-			$actual_result_arr_new[ 'OAuth oauth_consumer_key' ]
+			$actual_result_arr_new['OAuth oauth_consumer_key']
 		);
 
 		$this->assertEquals(
 			'56',
-			$actual_result_arr_new[ 'oauth_token' ]
+			$actual_result_arr_new['oauth_token']
 		);
 
 		$this->assertEquals(
-			$actual_result_arr_new[ 'oauth_signature_method' ],
+			$actual_result_arr_new['oauth_signature_method'],
 			'HMAC-SHA1'
 		);
 
 		$this->assertTrue(
 			isset(
-				$actual_result_arr_new[ 'oauth_timestamp' ]
+				$actual_result_arr_new['oauth_timestamp']
 			)
-			&&
-			$actual_result_arr_new[ 'oauth_timestamp' ] > 0
+			&& $actual_result_arr_new['oauth_timestamp'] > 0
 		);
 
 		$this->assertTrue(
 			is_string(
-				$actual_result_arr_new[ 'oauth_nonce' ]
+				$actual_result_arr_new['oauth_nonce']
 			)
-			&&
-			strlen(
-				$actual_result_arr_new[ 'oauth_nonce' ]
+			&& strlen(
+				$actual_result_arr_new['oauth_nonce']
 			)
 		);
 
 		$signature_expected = hash_hmac(
 			'sha1',
-			strtoupper( $oauth_method ) . '&' .
-				rawurlencode( $oauth_url ) . '&' .
-				rawurlencode(
-					rawurlencode( 'oauth_consumer_key' ) . '=' . rawurlencode( $oauth_keys[ 'oauth_consumer_key' ] ) . '&' .
-					rawurlencode( 'oauth_nonce' ) . '=' . rawurlencode( $actual_result_arr_new[ 'oauth_nonce' ] ) . '&' .
-					rawurlencode( 'oauth_signature_method' ) . '=' . rawurlencode( $actual_result_arr_new[ 'oauth_signature_method' ] ) . '&' .
-					rawurlencode( 'oauth_timestamp' ) . '=' . rawurlencode( $actual_result_arr_new[ 'oauth_timestamp' ] ) . '&' .
-					rawurlencode( 'oauth_token' ) . '=' . rawurlencode( $oauth_keys[ 'oauth_token' ] )
-				),
+			strtoupper( $oauth_method ) . '&' . rawurlencode( $oauth_url ) . '&' . rawurlencode(
+				rawurlencode( 'oauth_consumer_key' ) . '=' . rawurlencode( $oauth_keys['oauth_consumer_key'] ) . '&' . rawurlencode( 'oauth_nonce' )
+				. '=' . rawurlencode( $actual_result_arr_new['oauth_nonce'] ) . '&' . rawurlencode( 'oauth_signature_method' ) . '=' . rawurlencode(
+					$actual_result_arr_new['oauth_signature_method']
+				) . '&' . rawurlencode( 'oauth_timestamp' ) . '=' . rawurlencode( $actual_result_arr_new['oauth_timestamp'] ) . '&' . rawurlencode(
+					'oauth_token'
+				) . '=' . rawurlencode( $oauth_keys['oauth_token'] )
+			),
 			$oauth_keys['oauth_consumer_secret'] . '&' . $oauth_keys['oauth_token_secret'],
 			true
 		);
 
 		$signature_expected = rawurlencode(
-			base64_encode( 
+			base64_encode(
 				$signature_expected
 			)
 		);

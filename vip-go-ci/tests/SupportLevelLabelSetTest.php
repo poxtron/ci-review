@@ -5,78 +5,50 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 use PHPUnit\Framework\TestCase;
 
 final class SupportLevelLabelSetTest extends TestCase {
-	var $options_meta_api_secrets = array(
-		'repo-meta-api-base-url'	=> null,
-		'repo-meta-api-user-id'		=> null,
-		'repo-meta-api-access-token'	=> null,
+	var $options_meta_api_secrets
+		= [
+			'repo-meta-api-base-url'     => null,
+			'repo-meta-api-user-id'      => null,
+			'repo-meta-api-access-token' => null,
 
-		'support-tier-name'		=> null,
-	);
+			'support-tier-name' => null,
+		];
 
-	var $options_git = array(
-		'git-path'		=> null,
-		'github-repo-url'	=> null,
-		'repo-name'		=> null,
-		'repo-owner'		=> null,
-	);
+	var $options_git
+		= [
+			'git-path'        => null,
+			'github-repo-url' => null,
+			'repo-name'       => null,
+			'repo-owner'      => null,
+		];
 
-	protected function setUp() {
-		vipgoci_unittests_get_config_values(
-			'repo-meta-api-secrets',
-			$this->options_meta_api_secrets,
-			true
-		);
-
-		vipgoci_unittests_get_config_values(
-			'git',
-			$this->options_git
-		);
-
-		$this->options = array_merge(
-			$this->options_meta_api_secrets,
-			$this->options_git
-		);
-
-		$this->options['branches-ignore'] = array();
-
-		$this->options['token'] =
-			vipgoci_unittests_get_config_value(
-				'git-secrets',
-				'github-token',
-				true // Fetch from secrets file
-			);
-
-		$this->options['commit'] =
-			vipgoci_unittests_get_config_value(
-				'repo-meta-api',
-				'commit-support-level-set-test'
-			);
-
-		$this->options['set-support-level-label-prefix'] =
-			'[MySupport Level]';
-	}
-
-	protected function tearDown() {
-		$this->options_meta_api_secrets = null;
-		$this->options_git = null;
-		$this->options = null;
-	}
-
-	protected function _findPrsImplicated() {
-		return vipgoci_github_prs_implicated(
-			$this->options['repo-owner'],
-			$this->options['repo-name'],
-			$this->options['commit'],
-			$this->options['token'],
-			$this->options['branches-ignore']
-		);
-	}
-
-	/*
-	 * Loop through each PR, count 
-	 * number of support-level labels
-	 * found and return.
+	/**
+	 * @covers ::vipgoci_support_level_label_set
 	 */
+	public function testSupportLevelSet1() {
+		$options_test = vipgoci_unittests_options_test(
+			$this->options,
+			[ 'repo-meta-api-user-id', 'repo-meta-api-access-token' ],
+			$this
+		);
+
+		$this->options['set-support-level-label'] = false;
+
+		$level_label = vipgoci_support_level_label_set(
+			$this->options
+		);
+
+		$this->assertFalse(
+			$level_label
+		);
+
+		$support_labels_cnt = $this->_findSupportLabelstoPrs();
+
+		$this->assertEquals(
+			0,
+			$support_labels_cnt
+		);
+	}
 
 	protected function _findSupportLabelstoPrs() {
 		$support_labels_cnt = 0;
@@ -101,13 +73,10 @@ final class SupportLevelLabelSetTest extends TestCase {
 				continue;
 			}
 
-			foreach( $pr_item_labels as $label_item ) {
-				if ( 
-					$this->options['set-support-level-label-prefix'] . ' ' . ucfirst( strtolower( $this->options['support-tier-name'] ) )
-					===
-					$label_item->name
-				) {
-					$support_labels_cnt++;
+			foreach ( $pr_item_labels as $label_item ) {
+				if ( $this->options['set-support-level-label-prefix'] . ' ' . ucfirst( strtolower( $this->options['support-tier-name'] ) )
+				     === $label_item->name ) {
+					$support_labels_cnt ++;
 				}
 			}
 		}
@@ -115,33 +84,21 @@ final class SupportLevelLabelSetTest extends TestCase {
 		return $support_labels_cnt;
 	}
 
-	/**
-	 * @covers ::vipgoci_support_level_label_set
-	 */
-	public function testSupportLevelSet1() {
-		$options_test = vipgoci_unittests_options_test(
-			$this->options,
-			array( 'repo-meta-api-user-id', 'repo-meta-api-access-token' ),
-			$this
-		);
-
-		$this->options['set-support-level-label'] = false;
-	
-		$level_label = vipgoci_support_level_label_set(
-			$this->options
-		);
-
-		$this->assertFalse(
-			$level_label
-		);
-
-		$support_labels_cnt = $this->_findSupportLabelstoPrs();
-
-		$this->assertEquals(
-			0,
-			$support_labels_cnt
+	protected function _findPrsImplicated() {
+		return vipgoci_github_prs_implicated(
+			$this->options['repo-owner'],
+			$this->options['repo-name'],
+			$this->options['commit'],
+			$this->options['token'],
+			$this->options['branches-ignore']
 		);
 	}
+
+	/*
+	 * Loop through each PR, count
+	 * number of support-level labels
+	 * found and return.
+	 */
 
 	/**
 	 * @covers ::vipgoci_support_level_label_set
@@ -149,11 +106,11 @@ final class SupportLevelLabelSetTest extends TestCase {
 	public function testSupportLevelSet2() {
 		$options_test = vipgoci_unittests_options_test(
 			$this->options,
-			array( 'repo-meta-api-user-id', 'repo-meta-api-access-token' ),
+			[ 'repo-meta-api-user-id', 'repo-meta-api-access-token' ],
 			$this
 		);
 
-		if ( -1 === $options_test ) {
+		if ( - 1 === $options_test ) {
 			return;
 		}
 
@@ -177,7 +134,7 @@ final class SupportLevelLabelSetTest extends TestCase {
 			0,
 			$support_labels_cnt
 		);
-	
+
 		/*
 		 * Attempt to set support level label.
 		 */
@@ -194,7 +151,7 @@ final class SupportLevelLabelSetTest extends TestCase {
 		 * support level label. Then delete any
 		 * we find to clean up.
 		 */
-	
+
 		$this->assertNotEmpty(
 			$prs_implicated
 		);
@@ -215,14 +172,12 @@ final class SupportLevelLabelSetTest extends TestCase {
 
 			$found_support_level_label = false;
 
-			foreach( $pr_item_labels as $label_item ) {
-				if (
-					$this->options['set-support-level-label-prefix'] . ' ' . ucfirst( strtolower( $this->options['support-tier-name'] ) ) ===
-					$label_item->name
-				) {
+			foreach ( $pr_item_labels as $label_item ) {
+				if ( $this->options['set-support-level-label-prefix'] . ' ' . ucfirst( strtolower( $this->options['support-tier-name'] ) )
+				     === $label_item->name ) {
 					/*
 					 * Clean up label and indicate we found it.
-					 */	
+					 */
 					vipgoci_github_pr_label_remove(
 						$this->options['repo-owner'],
 						$this->options['repo-name'],
@@ -240,5 +195,47 @@ final class SupportLevelLabelSetTest extends TestCase {
 				$found_support_level_label
 			);
 		}
+	}
+
+	protected function setUp() {
+		vipgoci_unittests_get_config_values(
+			'repo-meta-api-secrets',
+			$this->options_meta_api_secrets,
+			true
+		);
+
+		vipgoci_unittests_get_config_values(
+			'git',
+			$this->options_git
+		);
+
+		$this->options = array_merge(
+			$this->options_meta_api_secrets,
+			$this->options_git
+		);
+
+		$this->options['branches-ignore'] = [];
+
+		$this->options['token']
+			= vipgoci_unittests_get_config_value(
+			'git-secrets',
+			'github-token',
+			true // Fetch from secrets file
+		);
+
+		$this->options['commit']
+			= vipgoci_unittests_get_config_value(
+			'repo-meta-api',
+			'commit-support-level-set-test'
+		);
+
+		$this->options['set-support-level-label-prefix']
+			= '[MySupport Level]';
+	}
+
+	protected function tearDown() {
+		$this->options_meta_api_secrets = null;
+		$this->options_git              = null;
+		$this->options                  = null;
 	}
 }

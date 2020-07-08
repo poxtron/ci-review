@@ -46,8 +46,6 @@ cd "$BOT_WORKSPACE"
 PHPCS_STANDARD="$BOT_WORKSPACE"/rules
 PHPCS_PATH="$BOT_WORKSPACE"/rules/vendor/bin/phpcs
 
-ls -lR
-
 echo "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=\$GH_BOT_TOKEN --phpcs-path=$PHPCS_PATH --local-git-repo=$BOT_WORKSPACE/repo --phpcs=true --phpcs-standard=$PHPCS_STANDARD --results-comments-sort=true"
 
 gosu etstaging bash -c "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=$PHPCS_PATH --local-git-repo=$BOT_WORKSPACE/repo --phpcs=true --phpcs-standard=$PHPCS_STANDARD --results-comments-sort=true"

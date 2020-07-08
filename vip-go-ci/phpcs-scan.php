@@ -56,9 +56,8 @@ function vipgoci_phpcs_do_scan(
 	 * put them in them now.
 	 */
 	if ( ! empty( $phpcs_runtime_set ) ) {
-		foreach(
-			$phpcs_runtime_set as
-				$phpcs_runtime_set_value
+		foreach (
+			$phpcs_runtime_set as $phpcs_runtime_set_value
 		) {
 			$cmd .= sprintf(
 				' --runtime-set %s %s',
@@ -81,9 +80,9 @@ function vipgoci_phpcs_do_scan(
 
 	vipgoci_log(
 		'Running PHPCS now',
-		array(
+		[
 			'cmd' => $cmd,
-		),
+		],
 		0
 	);
 
@@ -125,16 +124,15 @@ function vipgoci_phpcs_scan_single_file(
 
 	vipgoci_log(
 		'About to PHPCS-scan file',
-		array(
-			'repo_owner' => $options['repo-owner'],
-			'repo_name' => $options['repo-name'],
-			'commit_id' => $options['commit'],
-			'filename' => $file_name,
+		[
+			'repo_owner'     => $options['repo-owner'],
+			'repo_name'      => $options['repo-name'],
+			'commit_id'      => $options['commit'],
+			'filename'       => $file_name,
 			'file_extension' => $file_extension,
 			'temp_file_name' => $temp_file_name,
-		)
+		]
 	);
-
 
 	$file_issues_str = vipgoci_phpcs_do_scan(
 		$temp_file_name,
@@ -153,13 +151,12 @@ function vipgoci_phpcs_scan_single_file(
 		true
 	);
 
-	return array(
-		'file_issues_arr_master'	=> $file_issues_arr_master,
-		'file_issues_str'		=> $file_issues_str,
-		'temp_file_name'		=> $temp_file_name,
-	);
+	return [
+		'file_issues_arr_master' => $file_issues_arr_master,
+		'file_issues_str'        => $file_issues_str,
+		'temp_file_name'         => $temp_file_name,
+	];
 }
-
 
 /**
  * Dump output of scan-analysis to a file,
@@ -169,15 +166,10 @@ function vipgoci_phpcs_scan_single_file(
  */
 
 function vipgoci_phpcs_scan_output_dump( $output_file, $data ) {
-	if (
-		( is_file( $output_file ) ) &&
-		( ! is_writeable( $output_file ) )
-	) {
+	if ( ( is_file( $output_file ) ) && ( ! is_writeable( $output_file ) ) ) {
 		vipgoci_log(
-			'File ' .
-				$output_file .
-				' is not writeable',
-			array()
+			'File ' . $output_file . ' is not writeable',
+			[]
 		);
 	} else {
 		file_put_contents(
@@ -201,9 +193,9 @@ function vipgoci_phpcs_scan_commit(
 	&$commit_issues_submit,
 	&$commit_issues_stats
 ) {
-	$repo_owner = $options['repo-owner'];
-	$repo_name  = $options['repo-name'];
-	$commit_id  = $options['commit'];
+	$repo_owner   = $options['repo-owner'];
+	$repo_name    = $options['repo-name'];
+	$commit_id    = $options['commit'];
 	$github_token = $options['token'];
 
 	vipgoci_runtime_measure( VIPGOCI_RUNTIME_START, 'phpcs_scan_commit' );
@@ -211,13 +203,12 @@ function vipgoci_phpcs_scan_commit(
 	vipgoci_log(
 		'About to PHPCS-scan repository',
 
-		array(
+		[
 			'repo_owner' => $repo_owner,
-			'repo_name' => $repo_name,
-			'commit_id' => $commit_id,
-		)
+			'repo_name'  => $repo_name,
+			'commit_id'  => $commit_id,
+		]
 	);
-
 
 	/*
 	 * First, figure out if a .gitmodules
@@ -231,21 +222,16 @@ function vipgoci_phpcs_scan_commit(
 		$repo_name,
 		$commit_id,
 		$github_token,
-		array(
-			'file_extensions'
-				=> array( 'gitmodules' ),
+		[
+			'file_extensions' => [ 'gitmodules' ],
 
-			'status'
-				=> array( 'added', 'modified' ),
-		)
+			'status' => [ 'added', 'modified' ],
+		]
 	);
-
 
 	if ( ! empty( $commit_info->files ) ) {
 		// FIXME: Do something about the .gitmodule file
 	}
-
-
 
 	// Fetch list of all Pull-Requests which the commit is a part of
 	$prs_implicated = vipgoci_github_prs_implicated(
@@ -256,25 +242,23 @@ function vipgoci_phpcs_scan_commit(
 		$options['branches-ignore']
 	);
 
-
 	/*
 	 * Get list of all files affected by
 	 * each Pull-Request implicated by the commit.
 	 */
 
 	vipgoci_log(
-		'Fetching list of all files affected by each Pull-Request ' .
-			'implicated by the commit',
+		'Fetching list of all files affected by each Pull-Request ' . 'implicated by the commit',
 
-		array(
+		[
 			'repo_owner' => $repo_owner,
-			'repo_name' => $repo_name,
-			'commit_id' => $commit_id,
-		)
+			'repo_name'  => $repo_name,
+			'commit_id'  => $commit_id,
+		]
 	);
 
-	$pr_item_files_changed = array();
-	$pr_item_files_changed['all'] = array();
+	$pr_item_files_changed        = [];
+	$pr_item_files_changed['all'] = [];
 
 	foreach ( $prs_implicated as $pr_item ) {
 		/*
@@ -298,49 +282,38 @@ function vipgoci_phpcs_scan_commit(
 			false, // exclude renamed files
 			false, // exclude removed files
 			false, // exclude permission changes
-			array(
-				'file_extensions' =>
-					/*
+			[
+				'file_extensions' => /*
 					 * If SVG-checks are enabled,
 					 * include it in the file-extensions
-					 */
-					array_merge(
-						array( 'php', 'js', 'twig' ),
-						( $options['svg-checks'] ?
-							array( 'svg' ) :
-							array()
-						)
-					),
-				'skip_folders' =>
-					$options['phpcs-skip-folders'],
-			)
+					 */ array_merge(
+					[ 'php', 'js', 'twig' ],
+					( $options['svg-checks'] ? [ 'svg' ] : [] )
+				),
+				'skip_folders'    => $options['phpcs-skip-folders'],
+			]
 		);
-
 
 		foreach ( $pr_item_files_tmp as $pr_item_file_name => $_tmp ) {
 			if ( in_array(
-				$pr_item_file_name,
-				$pr_item_files_changed['all'],
-				true
-			) === false ) {
-				$pr_item_files_changed['all'][] =
-					$pr_item_file_name;
+				     $pr_item_file_name,
+				     $pr_item_files_changed['all'],
+				     true
+			     ) === false ) {
+				$pr_item_files_changed['all'][] = $pr_item_file_name;
 			}
 
 			if ( in_array(
-				$pr_item_file_name,
-				$pr_item_files_changed[ $pr_item->number ],
-				true
-			) === false ) {
-				$pr_item_files_changed[
-					$pr_item->number
-				][] = $pr_item_file_name;
+				     $pr_item_file_name,
+				     $pr_item_files_changed[ $pr_item->number ],
+				     true
+			     ) === false ) {
+				$pr_item_files_changed[ $pr_item->number ][] = $pr_item_file_name;
 			}
 		}
 	}
 
-
-	$files_issues_arr = array();
+	$files_issues_arr = [];
 
 	/*
 	 * Loop through each altered file in all the Pull-Requests,
@@ -349,16 +322,14 @@ function vipgoci_phpcs_scan_commit(
 	 */
 
 	vipgoci_log(
-		'About to PHPCS-scan all files affected by any of the ' .
-			'Pull-Requests',
+		'About to PHPCS-scan all files affected by any of the ' . 'Pull-Requests',
 
-		array(
-			'repo_owner' => $repo_owner,
-			'repo_name' => $repo_name,
-			'commit_id' => $commit_id,
-			'all_files_changed_by_prs' =>
-				$pr_item_files_changed['all'],
-		)
+		[
+			'repo_owner'               => $repo_owner,
+			'repo_name'                => $repo_name,
+			'commit_id'                => $commit_id,
+			'all_files_changed_by_prs' => $pr_item_files_changed['all'],
+		]
 	);
 
 	vipgoci_runtime_measure( VIPGOCI_RUNTIME_START, 'phpcs_scan_single_file' );
@@ -381,27 +352,19 @@ function vipgoci_phpcs_scan_commit(
 		 * However, only do this if SVG-checks
 		 * is enabled.
 		 */
-		$scanning_func =
-			(
-				( 'svg' === $file_extension ) &&
-				( $options['svg-checks'] )
-			) ?
-				'vipgoci_svg_scan_single_file' :
-				'vipgoci_phpcs_scan_single_file';
+		$scanning_func = ( ( 'svg' === $file_extension ) && ( $options['svg-checks'] ) ) ? 'vipgoci_svg_scan_single_file'
+			: 'vipgoci_phpcs_scan_single_file';
 
 		$tmp_scanning_results = $scanning_func(
 			$options,
 			$file_name
 		);
 
-		$file_issues_arr_master =
-			$tmp_scanning_results['file_issues_arr_master'];
+		$file_issues_arr_master = $tmp_scanning_results['file_issues_arr_master'];
 
-		$file_issues_str =
-			$tmp_scanning_results['file_issues_str'];
+		$file_issues_str = $tmp_scanning_results['file_issues_str'];
 
-		$temp_file_name =
-			$tmp_scanning_results['temp_file_name'];
+		$temp_file_name = $tmp_scanning_results['temp_file_name'];
 
 		/*
 		 * Keep statistics on number of lines
@@ -417,22 +380,17 @@ function vipgoci_phpcs_scan_commit(
 		 * Do sanity-checking
 		 */
 
-		if (
-			( null === $file_issues_arr_master ) ||
-			( ! isset( $file_issues_arr_master['totals'] ) ) ||
-			( ! isset( $file_issues_arr_master['files'] ) )
-		) {
+		if ( ( null === $file_issues_arr_master ) || ( ! isset( $file_issues_arr_master['totals'] ) )
+		     || ( ! isset( $file_issues_arr_master['files'] ) ) ) {
 			vipgoci_log(
 				'Failed parsing output from PHPCS',
-				array(
-					'repo_owner' => $repo_owner,
-					'repo_name' => $repo_name,
-					'commit_id' => $commit_id,
-					'file_issues_arr_master' =>
-						$file_issues_arr_master,
-					'file_issues_str' =>
-						$file_issues_str,
-				),
+				[
+					'repo_owner'             => $repo_owner,
+					'repo_name'              => $repo_name,
+					'commit_id'              => $commit_id,
+					'file_issues_arr_master' => $file_issues_arr_master,
+					'file_issues_str'        => $file_issues_str,
+				],
 				0,
 				true // log to IRC
 			);
@@ -442,7 +400,7 @@ function vipgoci_phpcs_scan_commit(
 			 *
 			 * Set an empty array just in case to avoid warnings.
 			 */
-			$files_issues_arr[ $file_name ] = array();
+			$files_issues_arr[ $file_name ] = [];
 
 			continue;
 		}
@@ -454,15 +412,15 @@ function vipgoci_phpcs_scan_commit(
 		 * 'level' key and value.
 		 */
 		$file_issues_arr_master = array_map(
-			function( $item ) {
+			function ( $item ) {
 				$item['level'] = $item['type'];
 
 				return $item;
 			},
 			$file_issues_arr_master
-				['files']
-				[ $temp_file_name ]
-				['messages']
+			['files']
+			[ $temp_file_name ]
+			['messages']
 		);
 
 		/*
@@ -481,13 +439,13 @@ function vipgoci_phpcs_scan_commit(
 		if ( ! empty( $options['output'] ) ) {
 			vipgoci_phpcs_scan_output_dump(
 				$options['output'],
-				array(
-					'repo_owner'	=> $repo_owner,
-					'repo_name'	=> $repo_name,
-					'commit_id'	=> $commit_id,
-					'filename'	=> $file_name,
-					'issues'	=> $file_issues_arr_master,
-				)
+				[
+					'repo_owner' => $repo_owner,
+					'repo_name'  => $repo_name,
+					'commit_id'  => $commit_id,
+					'filename'   => $file_name,
+					'issues'     => $file_issues_arr_master,
+				]
 			);
 		}
 
@@ -497,7 +455,7 @@ function vipgoci_phpcs_scan_commit(
 		 */
 		vipgoci_log(
 			'Cleaning up after scanning of file...',
-			array()
+			[]
 		);
 
 		unset( $file_contents );
@@ -522,29 +480,24 @@ function vipgoci_phpcs_scan_commit(
 
 	vipgoci_log(
 		'Figuring out which comment(s) to submit to GitHub, if any',
-		array(
+		[
 			'repo_owner' => $repo_owner,
-			'repo_name' => $repo_name,
-			'commit_id' => $commit_id,
-		)
+			'repo_name'  => $repo_name,
+			'commit_id'  => $commit_id,
+		]
 	);
-
 
 	foreach ( $prs_implicated as $pr_item ) {
 		vipgoci_log(
-			'Preparing to process PHPCS scanned files in ' .
-				'Pull-Request, to construct results ' .
-				'to be submitted',
-			array(
+			'Preparing to process PHPCS scanned files in ' . 'Pull-Request, to construct results ' . 'to be submitted',
+			[
 				'repo_owner'    => $repo_owner,
 				'repo_name'     => $repo_name,
 				'commit_id'     => $commit_id,
 				'pr_number'     => $pr_item->number,
-				'files_changed' =>
-					$pr_item_files_changed[ $pr_item->number ]
-			)
+				'files_changed' => $pr_item_files_changed[ $pr_item->number ]
+			]
 		);
-
 
 		/*
 		 * Check if user requested to turn off PHPCS
@@ -555,10 +508,7 @@ function vipgoci_phpcs_scan_commit(
 		 * This is only done if allowed via option.
 		 */
 
-		if (
-			true ===
-			$options['phpcs-skip-scanning-via-labels-allowed']
-		) {
+		if ( true === $options['phpcs-skip-scanning-via-labels-allowed'] ) {
 			$pr_label_skip_phpcs = vipgoci_github_pr_labels_get(
 				$repo_owner,
 				$repo_name,
@@ -569,36 +519,28 @@ function vipgoci_phpcs_scan_commit(
 
 			if ( ! empty( $pr_label_skip_phpcs ) ) {
 				vipgoci_log(
-					'Label on Pull-Request indicated to ' .
-						'skip PHPCS-scanning; ' .
-						'scanning will be skipped',
-					array(
-						'repo_owner'
-							=> $repo_owner,
+					'Label on Pull-Request indicated to ' . 'skip PHPCS-scanning; ' . 'scanning will be skipped',
+					[
+						'repo_owner' => $repo_owner,
 
-						'repo_name'
-							=> $repo_name,
+						'repo_name' => $repo_name,
 
-						'commit_id'
-							=> $commit_id,
+						'commit_id' => $commit_id,
 
-						'pr_number'
-							=> $pr_item->number,
+						'pr_number' => $pr_item->number,
 
-						'pr_label_skip_phpcs'
-							=> $pr_label_skip_phpcs,
-					)
+						'pr_label_skip_phpcs' => $pr_label_skip_phpcs,
+					]
 				);
 
 				unset(
 					$commit_issues_stats
-						[ $pr_item->number ]
+					[ $pr_item->number ]
 				);
 
 				continue;
 			}
 		}
-
 
 		/*
 		 * Get all commits related to the current
@@ -611,7 +553,6 @@ function vipgoci_phpcs_scan_commit(
 			$github_token
 		);
 
-
 		/*
 		 * Loop through each file, get a
 		 * 'git blame' log for the file, then
@@ -621,10 +562,8 @@ function vipgoci_phpcs_scan_commit(
 		 */
 
 		foreach (
-			$pr_item_files_changed[ $pr_item->number ] as
-				$_tmp => $file_name
-			) {
-
+			$pr_item_files_changed[ $pr_item->number ] as $_tmp => $file_name
+		) {
 			/*
 			 * Get blame log for file
 			 */
@@ -646,7 +585,6 @@ function vipgoci_phpcs_scan_commit(
 			$file_relative_lines = @array_flip(
 				$file_changed_lines
 			);
-
 
 			/*
 			 * Filter the issues we found
@@ -670,43 +608,25 @@ function vipgoci_phpcs_scan_commit(
 			 * we need to submit about
 			 */
 
-			foreach( $file_issues_arr_filtered as
-				$file_issue_val_key =>
-				$file_issue_val_item
-			) {
-				$commit_issues_submit[
-					$pr_item->number
-				][] = array(
-					'type'		=> VIPGOCI_STATS_PHPCS,
+			foreach ( $file_issues_arr_filtered as $file_issue_val_key => $file_issue_val_item ) {
+				$commit_issues_submit[ $pr_item->number ][] = [
+					'type' => VIPGOCI_STATS_PHPCS,
 
-					'file_name'	=>
-						$file_name,
+					'file_name' => $file_name,
 
-					'file_line'	=>
-						$file_relative_lines[
-							$file_issue_val_item[
-								'line'
-						]
-					],
+					'file_line' => $file_relative_lines[ $file_issue_val_item['line'] ],
 
-					'issue'		=>
-						$file_issue_val_item,
-				);
+					'issue' => $file_issue_val_item,
+				];
 
 				/*
 				 * Collect statistics on
 				 * number of warnings/errors
 				 */
 
-				$commit_issues_stats[
-					$pr_item->number
-				][
-					strtolower(
-						$file_issue_val_item[
-							'level'
-						]
-					)
-				]++;
+				$commit_issues_stats[ $pr_item->number ][ strtolower(
+					$file_issue_val_item['level']
+				) ] ++;
 			}
 		}
 
@@ -724,7 +644,7 @@ function vipgoci_phpcs_scan_commit(
 	 */
 	vipgoci_log(
 		'Cleaning up after PHPCS-scanning...',
-		array()
+		[]
 	);
 
 	unset( $prs_implicated );
@@ -739,17 +659,17 @@ function vipgoci_phpcs_scan_commit(
  * Ask PHPCS for a list of all sniffs that are active
  * in the specified standard. Returns with an array
  * of active sniffs.
- */ 
+ */
 function vipgoci_phpcs_get_sniffs_for_standard(
 	$phpcs_path,
 	$phpcs_standard
 ) {
 	vipgoci_log(
 		'Getting sniffs active in PHPCS standard',
-		array(
-			'phpcs-path'		=> $phpcs_path,
-			'phpcs-standard'	=> $phpcs_standard,
-		)
+		[
+			'phpcs-path'     => $phpcs_path,
+			'phpcs-standard' => $phpcs_standard,
+		]
 	);
 
 	/*
@@ -764,9 +684,9 @@ function vipgoci_phpcs_get_sniffs_for_standard(
 
 	vipgoci_log(
 		'Running PHPCS now to get sniffs',
-		array(
+		[
 			'cmd' => $cmd,
-		),
+		],
 		0
 	);
 
@@ -787,7 +707,7 @@ function vipgoci_phpcs_get_sniffs_for_standard(
 	 */
 	$sniffs_arr = array_filter(
 		$sniffs_arr,
-		function( $line_item ) {
+		function ( $line_item ) {
 			if ( false === strpos( $line_item, '.' ) ) {
 				return false;
 			}
@@ -810,7 +730,7 @@ function vipgoci_phpcs_get_sniffs_for_standard(
 	 * from list of sniffs.
 	 */
 	$sniffs_arr = array_map(
-		function( $sniff_item ) {
+		function ( $sniff_item ) {
 			return trim( $sniff_item );
 		},
 		$sniffs_arr
@@ -846,11 +766,11 @@ function vipgoci_phpcs_validate_sniffs_in_options_and_report(
 ) {
 	vipgoci_log(
 		'Validating sniffs provided in options',
-		array(
-			'phpcs-path'		=> $options['phpcs-path'],
-			'phpcs-standard'	=> $options['phpcs-standard'],
-			'phpcs-sniffs-exclude'	=> $options['phpcs-sniffs-exclude'],
-		)
+		[
+			'phpcs-path'           => $options['phpcs-path'],
+			'phpcs-standard'       => $options['phpcs-standard'],
+			'phpcs-sniffs-exclude' => $options['phpcs-sniffs-exclude'],
+		]
 	);
 
 	/*
@@ -868,7 +788,7 @@ function vipgoci_phpcs_validate_sniffs_in_options_and_report(
 	 * but are not part of the standards available.
 	 *
 	 * Normalise and sort the results.
- 	 */
+	  */
 	$phpcs_sniffs_exclude_invalid = array_diff(
 		$options['phpcs-sniffs-exclude'],
 		$phpcs_sniffs_valid
@@ -884,10 +804,10 @@ function vipgoci_phpcs_validate_sniffs_in_options_and_report(
 
 	vipgoci_log(
 		'Got valid PHPCS sniffs, calculated invalid PHPCS sniffs',
-		array(
-			'phpcs-sniffs-valid' 		=> $phpcs_sniffs_valid,
-			'phpcs-sniffs-exclude-invalid'	=> $phpcs_sniffs_exclude_invalid,
-		),
+		[
+			'phpcs-sniffs-valid'           => $phpcs_sniffs_valid,
+			'phpcs-sniffs-exclude-invalid' => $phpcs_sniffs_exclude_invalid,
+		],
 		2
 	);
 
@@ -914,30 +834,28 @@ function vipgoci_phpcs_validate_sniffs_in_options_and_report(
 				/*
 				 * Send invalid sniffs message,
 				 * but append the sniffs that are invalid.
-				 */
-				VIPGOCI_PHPCS_INVALID_SNIFFS .
-					'`' . implode(
-						', ',
-						$phpcs_sniffs_exclude_invalid
-					) . '`',
+				 */ VIPGOCI_PHPCS_INVALID_SNIFFS . '`' . implode(
+					', ',
+					$phpcs_sniffs_exclude_invalid
+				) . '`',
 				$options['commit']
 			);
 		}
 
 		/*
-	 	 * Dynamically remove invalid sniffs from options
+		  * Dynamically remove invalid sniffs from options
 		 */
 		vipgoci_log(
 			'Dynamically removing invalid PHPCS sniffs from options',
-			array(
-				'phpcs-sniffs-exclude'		=> $options['phpcs-sniffs-exclude'],
-				'phpcs-sniffs-exclude-invalid'	=> $phpcs_sniffs_exclude_invalid,
-			)
+			[
+				'phpcs-sniffs-exclude'         => $options['phpcs-sniffs-exclude'],
+				'phpcs-sniffs-exclude-invalid' => $phpcs_sniffs_exclude_invalid,
+			]
 		);
 
 		$options['phpcs-sniffs-exclude'] = array_filter(
 			$options['phpcs-sniffs-exclude'],
-			function( $sniff_item ) use ( $phpcs_sniffs_exclude_invalid ) {
+			function ( $sniff_item ) use ( $phpcs_sniffs_exclude_invalid ) {
 				if ( in_array(
 					$sniff_item,
 					$phpcs_sniffs_exclude_invalid,
@@ -957,11 +875,11 @@ function vipgoci_phpcs_validate_sniffs_in_options_and_report(
 
 	vipgoci_log(
 		'Validated sniffs provided in options',
-		array(
-			'phpcs-path'			=> $options['phpcs-path'],
-			'phpcs-standard'		=> $options['phpcs-standard'],
-			'phpcs-sniffs-exclude-after'	=> $options['phpcs-sniffs-exclude'],
-			'phpcs-sniffs-exclude-invalid'	=> $phpcs_sniffs_exclude_invalid,
-		)
+		[
+			'phpcs-path'                   => $options['phpcs-path'],
+			'phpcs-standard'               => $options['phpcs-standard'],
+			'phpcs-sniffs-exclude-after'   => $options['phpcs-sniffs-exclude'],
+			'phpcs-sniffs-exclude-invalid' => $phpcs_sniffs_exclude_invalid,
+		]
 	);
 }

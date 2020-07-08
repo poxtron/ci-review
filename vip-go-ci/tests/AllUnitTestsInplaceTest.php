@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 final class AllUnitTestsInplaceTest extends TestCase {
 	public function testAllUnitTestsInPlace() {
-		$files_arr = scandir("tests/");
+		$files_arr = scandir( "tests/" );
 
 		/*
 		 * Filter away any files that
@@ -19,8 +19,8 @@ final class AllUnitTestsInplaceTest extends TestCase {
 		 */
 		$files_arr = array_filter(
 			$files_arr,
-			function( $file_item ) {
-				switch( $file_item ) {
+			function ( $file_item ) {
+				switch ( $file_item ) {
 					case '.':
 					case '..':
 					case 'Skeleton.php':
@@ -29,8 +29,7 @@ final class AllUnitTestsInplaceTest extends TestCase {
 						 * Remove those away from
 						 * the resulting array, are
 						 * supporting files.
-						 */
-						return false;
+						 */ return false;
 						break;
 				}
 
@@ -51,6 +50,7 @@ final class AllUnitTestsInplaceTest extends TestCase {
 				 * Any other files,
 				 * keep them in.
 				 */
+
 				return true;
 			}
 		);

@@ -8,7 +8,7 @@
 
 function vipgoci_log(
 	$str,
-	$debug_data = array(),
+	$debug_data = [],
 	$debug_level = 0,
 	$irc = false
 ) {
@@ -26,17 +26,13 @@ function vipgoci_log(
 		return;
 	}
 
-	echo '[ ' . date( 'c' ) . ' -- ' . (int) $debug_level . ' ]  ' .
-		$str .
-		'; ' .
-		print_r(
+	echo '[ ' . date( 'c' ) . ' -- ' . (int) $debug_level . ' ]  ' . $str . '; ' . print_r(
 			json_encode(
 				$debug_data,
 				JSON_PRETTY_PRINT
 			),
 			true
-		) .
-		PHP_EOL;
+		) . PHP_EOL;
 
 	/*
 	 * Send to IRC API as well if asked
@@ -44,14 +40,12 @@ function vipgoci_log(
 	 */
 	if ( true === $irc ) {
 		vipgoci_irc_api_alert_queue(
-			$str .
-				'; ' .
-				print_r(
-					json_encode(
-						$debug_data
-					),
-					true
-				)
+			$str . '; ' . print_r(
+				json_encode(
+					$debug_data
+				),
+				true
+			)
 		);
 	}
 }
@@ -65,7 +59,7 @@ function vipgoci_log(
 
 function vipgoci_sysexit(
 	$str,
-	$debug_data = array(),
+	$debug_data = [],
 	$exit_status = VIPGOCI_EXIT_USAGE_ERROR
 ) {
 	if ( $exit_status === VIPGOCI_EXIT_USAGE_ERROR ) {
@@ -84,7 +78,7 @@ function vipgoci_sysexit(
 /*
  * Check if a particular set of fields exist
  * in a target array and if their values match a set
- * given. Will return an array describing 
+ * given. Will return an array describing
  * which items of the array contain all the fields
  * and the matching values.
  *
@@ -122,25 +116,23 @@ function vipgoci_sysexit(
  *	);
  */
 function vipgoci_find_fields_in_array( $fields_arr, $data_arr ) {
-	$res_arr = array();
+	$res_arr = [];
 
-	for(
-		$data_item_cnt = 0;
-		$data_item_cnt < count( $data_arr );
-		$data_item_cnt++
+	for (
+		$data_item_cnt = 0; $data_item_cnt < count( $data_arr ); $data_item_cnt ++
 	) {
 		$res_arr[ $data_item_cnt ] = 0;
 
-		foreach( $fields_arr as $field_name => $field_values ) {
+		foreach ( $fields_arr as $field_name => $field_values ) {
 			if ( ! array_key_exists( $field_name, $data_arr[ $data_item_cnt ] ) ) {
 				continue;
 			}
 
-			foreach( $field_values as $field_value_item ) {
+			foreach ( $field_values as $field_value_item ) {
 				if ( $data_arr[ $data_item_cnt ][ $field_name ] === $field_value_item ) {
-					$res_arr[ $data_item_cnt ]++;
+					$res_arr[ $data_item_cnt ] ++;
 
-					/* 
+					/*
 					 * Once we find a match, stop searching.
 					 * This is to safeguard against any kind of
 					 * multiple matches (which though are nearly
@@ -151,13 +143,7 @@ function vipgoci_find_fields_in_array( $fields_arr, $data_arr ) {
 			}
 		}
 
-		$res_arr[
-			$data_item_cnt
-		] = (
-			$res_arr[ $data_item_cnt ]
-			===
-			count( array_keys( $fields_arr ) )
-		);
+		$res_arr[ $data_item_cnt ] = ( $res_arr[ $data_item_cnt ] === count( array_keys( $fields_arr ) ) );
 	}
 
 	return $res_arr;
@@ -168,7 +154,7 @@ function vipgoci_find_fields_in_array( $fields_arr, $data_arr ) {
  * "null" to a variable of that type.
  */
 function vipgoci_convert_string_to_type( $str ) {
-	switch( $str ) {
+	switch ( $str ) {
 		case 'true':
 			$ret = true;
 			break;
@@ -210,7 +196,6 @@ function vipgoci_patch_changed_lines(
 	$commit_id,
 	$file_name
 ) {
-
 	/*
 	 * Fetch patch for all files of the Pull-Request
 	 */
@@ -235,7 +220,7 @@ function vipgoci_patch_changed_lines(
 		$patch_arr[ $file_name ]
 	);
 
-	$lines_changed = array();
+	$lines_changed = [];
 
 	$i = 1;
 
@@ -252,31 +237,19 @@ function vipgoci_patch_changed_lines(
 				$matches[2][0]
 			);
 
-
 			$i = $start_end[0];
 
-
 			$lines_changed[] = null;
-		}
-
-		else if ( empty( $matches[0] ) ) {
+		} elseif ( empty( $matches[0] ) ) {
 			if ( empty( $line[0] ) ) {
 				// Do nothing
-			}
-
-			else if (
-				( $line[0] == '-' ) ||
-				( $line[0] == '\\' )
-			) {
+			} elseif ( ( $line[0] == '-' )
+			           || ( $line[0] == '\\' ) ) {
 				$lines_changed[] = null;
-			}
-
-			else if (
-				( $line[0] == '+' ) ||
-				( $line[0] == " " ) ||
-				( $line[0] == "\t" )
-			) {
-				$lines_changed[] = $i++;
+			} elseif ( ( $line[0] == '+' )
+			           || ( $line[0] == " " )
+			           || ( $line[0] == "\t" ) ) {
+				$lines_changed[] = $i ++;
 			}
 		}
 	}
@@ -288,21 +261,15 @@ function vipgoci_patch_changed_lines(
 	 * simply hard-code line 1 in the patch to match
 	 * with line 1 in the code.
 	 */
-	if (
-		( isset( $lines_changed[1] ) ) &&
-		(
-			( $lines_changed[1] === null ) ||
-			( $lines_changed[1] === 0 )
-		)
-		||
-		( ! isset( $lines_changed[1] ) )
-	) {
+	if ( ( isset( $lines_changed[1] ) )
+	     && ( ( $lines_changed[1] === null )
+	          || ( $lines_changed[1] === 0 ) )
+	     || ( ! isset( $lines_changed[1] ) ) ) {
 		$lines_changed[1] = 1;
 	}
 
 	return $lines_changed;
 }
-
 
 /*
  * Get a specific item from in-memory cache based on
@@ -325,17 +292,11 @@ function vipgoci_cache( $cache_id_arr, $data = null ) {
 	 * Special invocation: Allow for
 	 * the cache to be cleared.
 	 */
-	if (
-		( is_string(
+	if ( ( is_string(
 			$cache_id_arr
 		) )
-		&&
-		(
-			VIPGOCI_CACHE_CLEAR ===
-			$cache_id_arr
-		)
-	) {
-		$vipgoci_cache_buffer = array();
+	     && ( VIPGOCI_CACHE_CLEAR === $cache_id_arr ) ) {
+		$vipgoci_cache_buffer = [];
 
 		return true;
 	}
@@ -343,7 +304,6 @@ function vipgoci_cache( $cache_id_arr, $data = null ) {
 	$cache_id = json_encode(
 		$cache_id_arr
 	);
-
 
 	if ( null === $data ) {
 		if ( isset( $vipgoci_cache_buffer[ $cache_id ] ) ) {
@@ -355,9 +315,7 @@ function vipgoci_cache( $cache_id_arr, $data = null ) {
 			}
 
 			return $ret;
-		}
-
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -372,7 +330,6 @@ function vipgoci_cache( $cache_id_arr, $data = null ) {
 	return $data;
 }
 
-
 /**
  * Support function for other functions
  * that use the internal cache and need to indicate
@@ -383,7 +340,6 @@ function vipgoci_cache( $cache_id_arr, $data = null ) {
 function vipgoci_cached_indication_str( $cache_used ) {
 	return $cache_used ? ' (cached)' : '';
 }
-
 
 /*
  * Create a temporary file, and return the
@@ -407,23 +363,21 @@ function vipgoci_save_temp_file(
 	 * file.
 	 */
 
-	if (
-		( null !== $file_name_extension ) &&
-		( false !== $temp_file_name )
-	) {
+	if ( ( null !== $file_name_extension )
+	     && ( false !== $temp_file_name ) ) {
 		$temp_file_name_old = $temp_file_name;
-		$temp_file_name .= '.' . $file_name_extension;
+		$temp_file_name     .= '.' . $file_name_extension;
 
 		if ( true !== rename(
-			$temp_file_name_old,
-			$temp_file_name
-		) ) {
+				$temp_file_name_old,
+				$temp_file_name
+			) ) {
 			vipgoci_sysexit(
 				'Unable to rename temporary file',
-				array(
+				[
 					'temp_file_name_old' => $temp_file_name_old,
 					'temp_file_name_new' => $temp_file_name,
-				),
+				],
 				VIPGOCI_EXIT_SYSTEM_PROBLEM
 			);
 		}
@@ -445,12 +399,11 @@ function vipgoci_save_temp_file(
 	// Detect possible errors when saving the temporary file
 	if ( false === $temp_file_save_status ) {
 		vipgoci_sysexit(
-			'Could not save file to disk, got ' .
-			'an error. Exiting...',
+			'Could not save file to disk, got ' . 'an error. Exiting...',
 
-			array(
+			[
 				'temp_file_name' => $temp_file_name,
-			),
+			],
 			VIPGOCI_EXIT_SYSTEM_PROBLEM
 		);
 	}
@@ -487,7 +440,7 @@ function vipgoci_file_extension_get( $file_name ) {
  * to be submitted to GitHub.
  */
 function vipgoci_github_transform_to_emojis( $text_string ) {
-	switch( strtolower( $text_string ) ) {
+	switch ( strtolower( $text_string ) ) {
 		case 'warning':
 			return ':warning:';
 
@@ -500,7 +453,6 @@ function vipgoci_github_transform_to_emojis( $text_string ) {
 
 	return '';
 }
-
 
 /*
  * Determine if the presented file has an
@@ -528,10 +480,10 @@ function vipgoci_filter_file_path(
 	 * file-extension, flag it.
 	 */
 
-	$file_ext_match =
-		( null !== $filter ) &&
-		( isset( $filter['file_extensions'] ) ) &&
-		( ! in_array(
+	$file_ext_match
+		= ( null !== $filter )
+		  && ( isset( $filter['file_extensions'] ) )
+		  && ( ! in_array(
 			$file_info_extension,
 			$filter['file_extensions'],
 			true
@@ -544,14 +496,12 @@ function vipgoci_filter_file_path(
 
 	$file_folders_match = false;
 
-	if (
-		( null !== $filter ) &&
-		( isset( $filter['skip_folders'] ) )
-	) {
+	if ( ( null !== $filter )
+	     && ( isset( $filter['skip_folders'] ) ) ) {
 		/*
 		 * Loop through all skip-folders.
 		 */
-		foreach(
+		foreach (
 			$filter['skip_folders'] as $tmp_skip_folder_item
 		) {
 			/*
@@ -572,11 +522,9 @@ function vipgoci_filter_file_path(
 			 * that the folder has to be at the root of the
 			 * path to be a match.
 			 */
-			if (
-				( false !== $file_folders_match ) &&
-				( is_numeric( $file_folders_match ) ) &&
-				( 0 === $file_folders_match )
-			) {
+			if ( ( false !== $file_folders_match )
+			     && ( is_numeric( $file_folders_match ) )
+			     && ( 0 === $file_folders_match ) ) {
 				$file_folders_match = true;
 				break;
 			}
@@ -588,27 +536,21 @@ function vipgoci_filter_file_path(
 	 * if either of the conditions are fulfiled.
 	 */
 
-	if (
-		( true === $file_ext_match ) ||
-		( true === $file_folders_match )
-	) {
+	if ( ( true === $file_ext_match )
+	     || ( true === $file_folders_match ) ) {
 		vipgoci_log(
-			'Skipping file that does not seem ' .
-				'to be a file matching ' .
-				'filter-criteria',
+			'Skipping file that does not seem ' . 'to be a file matching ' . 'filter-criteria',
 
-			array(
-				'filename' =>
-					$filename,
+			[
+				'filename' => $filename,
 
-				'filter' =>
-					$filter,
+				'filter' => $filter,
 
-				'matches' => array(
-					'file_ext_match' => $file_ext_match,
+				'matches' => [
+					'file_ext_match'     => $file_ext_match,
 					'file_folders_match' => $file_folders_match,
-				),
-			),
+				],
+			],
 			2
 		);
 
@@ -617,7 +559,6 @@ function vipgoci_filter_file_path(
 
 	return true;
 }
-
 
 /*
  * Recursively scan the git repository,
@@ -628,16 +569,16 @@ function vipgoci_filter_file_path(
  * that is reserved for internal use only.
  */
 function vipgoci_scandir_git_repo( $path, $filter, $base_path = null ) {
-	$result = array();
+	$result = [];
 
 	vipgoci_log(
 		'Fetching git-tree using scandir()',
 
-		array(
-			'path' => $path,
-			'filter' => $filter,
+		[
+			'path'      => $path,
+			'filter'    => $filter,
 			'base_path' => $base_path,
-		),
+		],
 		2
 	);
 
@@ -647,7 +588,7 @@ function vipgoci_scandir_git_repo( $path, $filter, $base_path = null ) {
 	 * when making sure we do not
 	 * accidentally filter by the filesystem
 	 * outside of the git-repository (see below).
- 	 */
+	  */
 	if ( null === $base_path ) {
 		$base_path = $path;
 	}
@@ -658,16 +599,14 @@ function vipgoci_scandir_git_repo( $path, $filter, $base_path = null ) {
 
 	vipgoci_runtime_measure( VIPGOCI_RUNTIME_STOP, 'git_repo_scandir' );
 
-
 	foreach ( $cdir as $key => $value ) {
 		if ( in_array(
 			$value,
-			array( '.', '..', '.git' )
+			[ '.', '..', '.git' ]
 		) ) {
 			// Skip '.' and '..'
 			continue;
 		}
-
 
 		if ( is_dir(
 			$path . DIRECTORY_SEPARATOR . $value
@@ -683,9 +622,7 @@ function vipgoci_scandir_git_repo( $path, $filter, $base_path = null ) {
 			);
 
 			foreach ( $tmp_result as $tmp_result_item ) {
-				$result[] = $value .
-					DIRECTORY_SEPARATOR .
-					$tmp_result_item;
+				$result[] = $value . DIRECTORY_SEPARATOR . $tmp_result_item;
 			}
 
 			continue;
@@ -712,9 +649,9 @@ function vipgoci_scandir_git_repo( $path, $filter, $base_path = null ) {
 			);
 
 			if ( false === vipgoci_filter_file_path(
-				$file_path_without_git_repo,
-				$filter
-			) ) {
+					$file_path_without_git_repo,
+					$filter
+				) ) {
 				continue;
 			}
 		}
@@ -726,7 +663,6 @@ function vipgoci_scandir_git_repo( $path, $filter, $base_path = null ) {
 	return $result;
 }
 
-
 /*
  * Go through the given blame-log, and
  * return only the items from the log that
@@ -737,7 +673,6 @@ function vipgoci_blame_filter_commits(
 	$blame_log,
 	$relevant_commit_ids
 ) {
-
 	/*
 	 * Loop through each file, get a
 	 * 'git blame' log for the file, so
@@ -746,7 +681,7 @@ function vipgoci_blame_filter_commits(
 	 * part of the current Pull-Request.
 	 */
 
-	$blame_log_filtered = array();
+	$blame_log_filtered = [];
 
 	foreach ( $blame_log as $blame_log_item ) {
 		if ( ! in_array(
@@ -757,13 +692,12 @@ function vipgoci_blame_filter_commits(
 			continue;
 		}
 
-		$blame_log_filtered[] =
-			$blame_log_item;
+		$blame_log_filtered[]
+			= $blame_log_item;
 	}
 
 	return $blame_log_filtered;
 }
-
 
 /*
  * Check if the specified comment exists
@@ -777,21 +711,15 @@ function vipgoci_github_comment_match(
 	$file_issue_comment,
 	$comments_made
 ) {
-
 	/*
 	 * Construct an index-key made of file:line.
 	 */
-	$comment_index_key =
-		$file_issue_path .
-		':' .
-		$file_issue_line;
-
+	$comment_index_key
+		= $file_issue_path . ':' . $file_issue_line;
 
 	if ( ! isset(
-		$comments_made[
-			$comment_index_key
-		]
-	)) {
+		$comments_made[ $comment_index_key ]
+	) ) {
 		/*
 		 * No match on index-key within the
 		 * associative array -- the comment has
@@ -800,7 +728,6 @@ function vipgoci_github_comment_match(
 		return false;
 	}
 
-
 	/*
 	 * Some comment matching the file and line-number
 	 * was found -- figure out if it is definately the
@@ -808,16 +735,15 @@ function vipgoci_github_comment_match(
 	 */
 
 	foreach (
-		$comments_made[ $comment_index_key ] as
-		$comment_made
+		$comments_made[ $comment_index_key ] as $comment_made
 	) {
 		/*
 		 * The comment might contain formatting, such
 		 * as "Warning: ..." -- remove all of that.
 		 */
 		$comment_made_body = str_replace(
-			array("**", "Warning", "Error", "Info", ":no_entry_sign:", ":warning:", ":information_source:"),
-			array("", "", "", "", ""),
+			[ "**", "Warning", "Error", "Info", ":no_entry_sign:", ":warning:", ":information_source:" ],
+			[ "", "", "", "", "" ],
 			$comment_made->body
 		);
 
@@ -876,17 +802,8 @@ function vipgoci_github_comment_match(
 		 * (GitHub encodes their comments when
 		 * returning them.
 		 */
-		if (
-			(
-				$comment_made_body ==
-				$file_issue_comment
-			)
-			||
-			(
-				$comment_made_body ==
-				htmlentities( $file_issue_comment )
-			)
-		) {
+		if ( ( $comment_made_body == $file_issue_comment )
+		     || ( $comment_made_body == htmlentities( $file_issue_comment ) ) ) {
 			/* Comment found, return true. */
 			return true;
 		}
@@ -894,7 +811,6 @@ function vipgoci_github_comment_match(
 
 	return false;
 }
-
 
 /*
  * Filter out any issues in the code that were not
@@ -914,23 +830,20 @@ function vipgoci_issues_filter_irrellevant(
 	 * of the Pull-Request
 	 */
 
-	$file_blame_log_filtered =
-		vipgoci_blame_filter_commits(
-			$file_blame_log,
-			$pr_item_commits
-		);
+	$file_blame_log_filtered
+		= vipgoci_blame_filter_commits(
+		$file_blame_log,
+		$pr_item_commits
+	);
 
-
-	$file_issues_ret = array();
+	$file_issues_ret = [];
 
 	/*
 	 * Loop through all the issues affecting
 	 * this particular file
 	 */
 	foreach (
-		$file_issues_arr[ $file_name ] as
-			$file_issue_key =>
-			$file_issue_val
+		$file_issues_arr[ $file_name ] as $file_issue_key => $file_issue_val
 	) {
 		$keep_issue = false;
 
@@ -939,10 +852,7 @@ function vipgoci_issues_filter_irrellevant(
 		 */
 
 		foreach ( $file_blame_log_filtered as $blame_log_item ) {
-			if (
-				$blame_log_item['line_no'] ===
-					$file_issue_val['line']
-			) {
+			if ( $blame_log_item['line_no'] === $file_issue_val['line'] ) {
 				$keep_issue = true;
 			}
 		}
@@ -978,18 +888,15 @@ function vipgoci_issues_filter_irrellevant(
  * a duplicate.
  */
 function vipgoci_issues_filter_duplicate( $file_issues_arr ) {
-	$issues_hashes = array();
-	$file_issues_arr_new = array();
+	$issues_hashes       = [];
+	$file_issues_arr_new = [];
 
-	foreach(
-		$file_issues_arr as
-			$issue_item_key => $issue_item_value
+	foreach (
+		$file_issues_arr as $issue_item_key => $issue_item_value
 	) {
 		$issue_item_hash = md5(
-			$issue_item_value['message']
-		)
-		. ':' .
-		$issue_item_value['line'];
+			                   $issue_item_value['message']
+		                   ) . ':' . $issue_item_value['line'];
 
 		if ( in_array( $issue_item_hash, $issues_hashes, true ) ) {
 			continue;
@@ -1011,19 +918,16 @@ function vipgoci_results_sort_by_severity(
 	$options,
 	&$results
 ) {
-
 	if ( true !== $options['results-comments-sort'] ) {
 		return;
 	}
 
 	vipgoci_log(
 		'Sorting issues in results according to severity before submission',
-		array(
-		)
+		[]
 	);
 
-
-	foreach(
+	foreach (
 		array_keys(
 			$results['issues']
 		) as $pr_number
@@ -1034,43 +938,40 @@ function vipgoci_results_sort_by_severity(
 		 * Temporarily add severity
 		 * column so we can sort using that.
 		 */
-		foreach(
-			array_keys( $current_pr_results ) as 
-				$current_pr_result_item_key
+		foreach (
+			array_keys( $current_pr_results ) as $current_pr_result_item_key
 		) {
-			$current_pr_results[ $current_pr_result_item_key ][ 'severity'] =
-				$current_pr_results[ $current_pr_result_item_key ]['issue']['severity'];
+			$current_pr_results[ $current_pr_result_item_key ]['severity']
+				= $current_pr_results[ $current_pr_result_item_key ]['issue']['severity'];
 		}
 
 		/*
 		 * Do the actual sorting.
 		 */
-		$severity_column  = array_column(
+		$severity_column = array_column(
 			$current_pr_results,
 			'severity'
 		);
 
 		array_multisort(
-		        $severity_column,
-		        SORT_DESC,
-		        $current_pr_results
+			$severity_column,
+			SORT_DESC,
+			$current_pr_results
 		);
 
 		/*
 		 * Remove severity column
 		 * afterwards.
 		 */
-		foreach(
-			array_keys( $current_pr_results ) as 
-				$current_pr_result_item_key
+		foreach (
+			array_keys( $current_pr_results ) as $current_pr_result_item_key
 		) {
 			unset(
-				$current_pr_results[ $current_pr_result_item_key ][ 'severity']
+				$current_pr_results[ $current_pr_result_item_key ]['severity']
 			);
 		}
 	}
 }
-
 
 /*
  * Add pagebreak to a Markdown-style comment
@@ -1099,35 +1000,30 @@ function vipgoci_markdown_comment_add_pagebreak(
 		$pagebreak_style
 	);
 
-
 	/*
 	 * If pagebreak is found, and is
 	 * at the end of the comment, bail
 	 * out and do nothing to the comment.
 	 */
 
-	if (
-		( false !== $pagebreak_location ) &&
-		(
-			$pagebreak_location +
-			strlen( $pagebreak_style )
-		)
-		===
-		strlen( $comment_copy )
-	) {
+	if ( ( false !== $pagebreak_location )
+	     && ( $pagebreak_location + strlen( $pagebreak_style ) ) === strlen( $comment_copy ) ) {
 		return;
 	}
 
 	$comment .= $pagebreak_style . "\n\r";
 }
 
-
 /*
  * Sanitize a string, removing any whitespace-characters
  * from the beginning and end, and transform to lowercase.
  */
 function vipgoci_sanitize_string( $str ) {
-	return strtolower( ltrim( rtrim(
-		$str
-	) ) );
+	return strtolower(
+		ltrim(
+			rtrim(
+				$str
+			)
+		)
+	);
 }
