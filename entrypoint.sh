@@ -27,26 +27,29 @@ fi
 #
 #rm -r $current_version $GOCI_VERSION.tar.gz
 
-
-cd "$GITHUB_WORKSPACE"/rules
-
-composer install
-
-cd "$GITHUB_WORKSPACE"
-
 COMMIT_ID=$(cat $GITHUB_EVENT_PATH | jq -r '.pull_request.head.sha')
 #PR_BODY=$(cat "$GITHUB_EVENT_PATH" | jq -r .pull_request.body)
 GITHUB_REPO_NAME=${GITHUB_REPOSITORY##*/}
 GITHUB_REPO_OWNER=${GITHUB_REPOSITORY%%/*}
 
-phpcs_standard="$GITHUB_WORKSPACE"/rules
-phpcs_path="$GITHUB_WORKSPACE"/rules/vendor/bin/phpcs
-
-export BOT_WORKSPACE="/home/etstaging/github-workspace"
+BOT_WORKSPACE="/home/etstaging"
 
 rsync -a "$GITHUB_WORKSPACE/" "$BOT_WORKSPACE"
 chown -R etstaging:etstaging "$BOT_WORKSPACE"
 
-echo "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=\$GH_BOT_TOKEN --phpcs-path=$phpcs_path --local-git-repo=$BOT_WORKSPACE/repo --phpcs=true --phpcs-standard=$phpcs_standard --results-comments-sort=true"
+cd "$BOT_WORKSPACE"/rules
 
-gosu etstaging bash -c "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=$phpcs_path --local-git-repo=$BOT_WORKSPACE/repo --phpcs=true --phpcs-standard=$phpcs_standard --results-comments-sort=true"
+composer install
+
+cd "$BOT_WORKSPACE"
+
+PHPCS_STANDARD="$BOT_WORKSPACE"/rules
+PHPCS_PATH="$BOT_WORKSPACE"/rules/vendor/bin/phpcs
+
+ls -lR
+
+echo "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=\$GH_BOT_TOKEN --phpcs-path=$PHPCS_PATH --local-git-repo=$BOT_WORKSPACE/repo --phpcs=true --phpcs-standard=$PHPCS_STANDARD --results-comments-sort=true"
+
+gosu etstaging bash -c "./vip-go-ci/vip-go-ci.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --commit=$COMMIT_ID --token=$GH_BOT_TOKEN --phpcs-path=$PHPCS_PATH --local-git-repo=$BOT_WORKSPACE/repo --phpcs=true --phpcs-standard=$PHPCS_STANDARD --results-comments-sort=true"
+
+# post-generic-pr-support-comments

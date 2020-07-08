@@ -25,7 +25,7 @@ RUN chmod +x /usr/local/bin/*.sh /usr/local/bin/run-review.php
 
 # copy modified version of vip-go-ci
 RUN mkdir -p /home/etstaging/vip-go-ci
-WORKDIR /home/etstaging/vip-go-ci
-COPY vip-go-ci ./
+#WORKDIR /home/etstaging/vip-go-ci
+ADD vip-go-ci /home/etstaging/vip-go-ci
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
