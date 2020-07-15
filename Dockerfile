@@ -21,7 +21,7 @@ RUN set -eux; \
 RUN useradd -m -s /bin/bash etstaging
 
 COPY entrypoint.sh /usr/local/bin/
-#RUN chmod +x /usr/local/bin/*.sh /usr/local/bin/run-review.php
+RUN chmod +x /usr/local/bin/*.sh
 
 # copy review script
 RUN mkdir -p /home/etstaging/review
