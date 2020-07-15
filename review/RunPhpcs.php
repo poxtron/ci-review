@@ -12,10 +12,10 @@ class RunPhpcs {
 	 * RunPhpcs constructor.
 	 */
 	private function __construct() {
-		$tempdir    = prepareFiles::getFilesDir();
+		$tempdir    = PrepareFiles::getFilesDir();
 		$filesLines = [];
 
-		foreach ( prepareFiles::getDiffResults() as $file => $data ) {
+		foreach ( PrepareFiles::getDiffResults() as $file => $data ) {
 			foreach ( $data as $line => $position ) {
 				array_push( $filesLines, "$file:" . ltrim( $line, '+' ) );
 			}
@@ -34,23 +34,19 @@ class RunPhpcs {
 		$warnings  = 0;
 		$results   = [];
 
-//		print_r($fileArray);
-//		print_r($filesLines);
-
 		foreach ( $fileArray['files'] as $fileName => $fileResults ) {
 			if ( ! empty( $fileResults['messages'] ) ) {
 				$cleanName = str_replace( $tempdir . DIRECTORY_SEPARATOR, '', $fileName );
 				foreach ( $fileResults['messages'] as $message ) {
-//					print_r( "$cleanName:{$message['line']}" );
 					if ( in_array( "$cleanName:{$message['line']}", $filesLines ) ) {
 						if ( ! isset( $results[ $cleanName ] ) ) {
 							$results[ $cleanName ] = [];
 						}
 						$results[ $cleanName ][] = $message;
 						if ( $message['type'] === 'WARNING' ) {
-							$warnings ++;
+							$warnings++;
 						} else {
-							$errors ++;
+							$errors++;
 						}
 					}
 				}

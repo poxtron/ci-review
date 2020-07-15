@@ -31,14 +31,8 @@ function auto_loader( $class_name ) {
 try {
 	$phpcsResults = RunPhpcs::getResults();
 	if ( ! empty( $phpcsResults ) ) {
-		// errase review main comment from token user
-
-		// erase review line comments from token user
-		//
-		print_r( $phpcsResults );
+		GitHubAPI::createReview();
 	}
-//    RunPhpcs::instance();
-
 } catch ( Exception $exception ) {
 	echo "ERROR: \n" . $exception->getMessage() . "\n";
 	die();

@@ -14,7 +14,7 @@ class Options {
 		'phpcs-standard:',
 		'base-branch:',
 		'pr-id:',
-//		'commit:', // TODO send commit ref to check if local repo is in correct HEAD
+		'commit:',
 	];
 
 	private static $instance = null;
@@ -23,6 +23,7 @@ class Options {
 
 	/**
 	 * Options constructor.
+	 *
 	 * @throws Exception
 	 */
 	private function __construct() {
@@ -40,16 +41,13 @@ class Options {
 		}
 
 		// Sanitization
-		if ( DIRECTORY_SEPARATOR === substr( trim( $this->options['repo-path'] ), - 1 ) ) {
-			$this->options['repo-path'] = substr( trim( $this->options['repo-path'] ), 0, - 1 );
+		if ( DIRECTORY_SEPARATOR === substr( trim( $this->options['repo-path'] ), -1 ) ) {
+			$this->options['repo-path'] = substr( trim( $this->options['repo-path'] ), 0, -1 );
 		}
 
 		if ( ! file_exists( $this->options['repo-path'] ) ) {
 			throw new Exception( 'Repo path is not valid.' );
 		}
-
-
-//		print_r( $this->options );
 	}
 
 	static function get( $option = null ) {

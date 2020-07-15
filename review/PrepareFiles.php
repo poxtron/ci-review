@@ -4,8 +4,7 @@ namespace ET\PR_Review;
 
 use Exception;
 
-
-class prepareFiles {
+class PrepareFiles {
 	private static $instance = null;
 
 	private $filesDir = '';
@@ -14,6 +13,7 @@ class prepareFiles {
 
 	/**
 	 * Run constructor.
+	 *
 	 * @throws Exception
 	 */
 	private function __construct() {
@@ -38,7 +38,7 @@ class prepareFiles {
 	}
 
 	private function parseDiff() {
-		$diffArray = githubAPI::getDiff();
+		$diffArray = GitHubAPI::getDiff();
 
 		$position      = 0;
 		$lineNumber    = 0;
@@ -59,7 +59,7 @@ class prepareFiles {
 				// get new file name and reset diff position.
 				if ( $line[0] . $line[1] === '++' ) {
 					$currentFile = trim( str_replace( [ '+++', ' b/' ], '', $line ) );
-					$position    = - 1;
+					$position    = -1;
 				}
 
 				// reset line number using hunk indicator.
@@ -81,11 +81,11 @@ class prepareFiles {
 
 				// increase line number if current line is modified or new.
 				if ( ! in_array( $line[0], [ '-', '@' ] ) ) {
-					$lineNumber ++;
+					$lineNumber++;
 				}
 
 				// increase diff position needed for commenting.
-				$position ++;
+				$position++;
 			}
 		}
 
@@ -99,7 +99,7 @@ class prepareFiles {
 	}
 
 	/**
-	 * @return prepareFiles
+	 * @return PrepareFiles
 	 */
 	static function instance() {
 		if ( null === self::$instance ) {

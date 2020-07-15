@@ -20,11 +20,11 @@ RUN set -eux; \
 
 RUN useradd -m -s /bin/bash etstaging
 
-COPY entrypoint.sh run-review.php /usr/local/bin/
-RUN chmod +x /usr/local/bin/*.sh /usr/local/bin/run-review.php
+COPY entrypoint.sh /usr/local/bin/
+#RUN chmod +x /usr/local/bin/*.sh /usr/local/bin/run-review.php
 
-# copy modified version of vip-go-ci
-RUN mkdir -p /home/etstaging/vip-go-ci
-ADD vip-go-ci /home/etstaging/vip-go-ci
+# copy review script
+RUN mkdir -p /home/etstaging/review
+ADD review /home/etstaging/review
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
