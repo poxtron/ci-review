@@ -30,7 +30,7 @@ function auto_loader( $class_name ) {
 
 try {
 	$phpcsResults = RunPhpcs::getResults();
-	if ( ! empty( $phpcsResults ) ) {
+	if ( ! empty( $phpcsResults['errors'] ) || !empty($phpcsResults['warnings']) ) {
 		GitHubAPI::createReview();
 	}
 } catch ( Exception $exception ) {
