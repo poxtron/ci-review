@@ -1,6 +1,6 @@
 name: 'PHPCS Code Review'
 description: 'This will run phpcs on PRs'
-author: 'elegantthemes'
+author: 'Elegant Themes, Inc. <miguel@elegantthemes.com>'
 runs:
   using: 'docker'
   image: 'docker://poxtron/ci-review:latest'
