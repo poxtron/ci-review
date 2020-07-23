@@ -8,8 +8,7 @@ class GitHubAPI {
 
 	const URL = 'https://api.github.com';
 
-	// TODO change below to true on production.
-	const SLEEP = false;
+	const SLEEP = true;
 
 	static function getDiff( $remote = true ) {
 		// create temporary file to store diff from local or remote source
@@ -53,7 +52,7 @@ class GitHubAPI {
 
 	static function maybeSleep() {
 		if ( self::SLEEP ) {
-			sleep( 10 );
+			sleep( 2 );
 		}
 	}
 
@@ -106,6 +105,9 @@ class GitHubAPI {
 			echo implode( "\n", $execResult );
 
 			self::maybeSleep();
+
+			// Tell GitHub actions that the action has errors or warnings.
+			exit( 1 );
 		}
 	}
 }
