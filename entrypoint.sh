@@ -23,7 +23,7 @@ chown -R etstaging:etstaging "$BOT_WORKSPACE"
 
 cd "$BOT_WORKSPACE"/rules
 
-composer install
+gosu etstaging bash -c "composer install"
 
 cd "$BOT_WORKSPACE"
 
