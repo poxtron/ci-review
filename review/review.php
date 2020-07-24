@@ -30,12 +30,12 @@ function auto_loader( $class_name ) {
 
 try {
 	$phpcsResults = RunPhpcs::getResults();
-	if ( ! empty( $phpcsResults['errors'] ) || !empty($phpcsResults['warnings']) ) {
+	if ( ! empty( $phpcsResults['errors'] ) || ! empty( $phpcsResults['warnings'] ) ) {
 		GitHubAPI::createReview();
 	}
 } catch ( Exception $exception ) {
 	echo "ERROR: \n" . $exception->getMessage() . "\n";
-	die();
+	exit( 1 );
 }
 
 //https://developer.github.com/v3/pulls/reviews/#create-a-review-for-a-pull-request/

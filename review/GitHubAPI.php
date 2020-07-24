@@ -89,6 +89,9 @@ class GitHubAPI {
 				}
 			}
 
+			// Print payload sent to github api.
+			print_r( $payload );
+
 			$payloadJSON   = json_encode( $payload );
 			$headersString = self::curlHeaders( [
 				'"Content-Type: application/json"',
