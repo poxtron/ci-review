@@ -25,15 +25,33 @@ class RunPhpcs {
 		$phpcs        = Options::get( 'phpcs-path' );
 		$standard     = Options::get( 'phpcs-standard' );
 		$tmpJson      = $tempdir . DIRECTORY_SEPARATOR . 'report.json';
-		$phpcsCommand = "$phpcs --standard=$standard --report=json --report-file=$tmpJson $tempdir";
+		$phpcsCommand = "$phpcs --standard=$standard --extensions=php --report=json --report-file=$tmpJson $tempdir";
 		exec( escapeshellcmd( $phpcsCommand ), $result );
 
-		// filter phpcs json results to only get modified lines
 		$fileArray = json_decode( file_get_contents( $tmpJson ), true );
+
+		$ignoreReason = $standard . DIRECTORY_SEPARATOR . 'IgnoreReason';
+		if ( file_exists( $ignoreReason ) ) {
+			$phpcsCommand = "$phpcs --standard=$ignoreReason --extensions=php --report=json --report-file=$tmpJson --ignore-annotations $tempdir";
+			exec( escapeshellcmd( $phpcsCommand ), $result );
+			$ignoreArray = json_decode( file_get_contents( $tmpJson ), true );
+			foreach ( $ignoreArray['files'] as $fileName => $fileResults ) {
+				if ( ! empty( $fileResults['messages'] ) ) {
+					if ( ! isset( $fileArray['files'][ $fileName ] ) ) {
+						$fileArray['files'][ $fileName ]             = [];
+						$fileArray['files'][ $fileName ]['messages'] = [];
+					}
+					$fileArray['files'][ $fileName ]['messages'] = array_merge( $fileArray['files'][ $fileName ]['messages'],
+						$fileResults['messages'] );
+				}
+			}
+		}
+
 		$errors    = 0;
 		$warnings  = 0;
 		$results   = [];
 
+		// Filter phpcs json results to only get modified lines.
 		foreach ( $fileArray['files'] as $fileName => $fileResults ) {
 			if ( ! empty( $fileResults['messages'] ) ) {
 				$cleanName = str_replace( $tempdir . DIRECTORY_SEPARATOR, '', $fileName );
