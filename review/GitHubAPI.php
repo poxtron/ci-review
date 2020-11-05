@@ -10,6 +10,8 @@ class GitHubAPI {
 
 	const SLEEP = true;
 
+	static $userName = '';
+
 	static function getDiff( $remote = true ) {
 		// create temporary file to store diff from local or remote source
 		$tempfile = tempnam( sys_get_temp_dir(), '' );
@@ -57,6 +59,10 @@ class GitHubAPI {
 	}
 
 	static function getTokenUsername() {
+		if ( ! empty( self::$userName ) ) {
+			return self::$userName;
+		}
+
 		$headersString = self::curlHeaders();
 		$url           = self::URL;
 
@@ -64,7 +70,9 @@ class GitHubAPI {
 		exec( $command, $execResult );
 		$userData = json_decode( implode( "\n", $execResult ), true );
 
-		return $userData['login'];
+		self::$userName = $userData['login'];
+
+		return self::$userName;
 	}
 
 	static function deletePRComments() {
@@ -133,12 +141,14 @@ class GitHubAPI {
 				}
 			}
 
-			if ( $phpcs['errors'] + $phpcs['warnings'] > 100 ) {
+			if ( $phpcs['errors'] + $phpcs['warnings'] >= 100 ) {
 				unset( $payload->comments );
 				$payload->body .= $stringErrors;
 			}
 
-			self::submitReview( $payload );
+			self::editLongReviews();
+
+			self::submitReview( $payload, $stringErrors );
 
 			// Tell GitHub actions that the action has errors or warnings.
 			exit( 1 );
@@ -160,10 +170,7 @@ class GitHubAPI {
 		}
 	}
 
-	static function submitReview( $payload ) {
-		// Print payload sent to github api.
-		print_r( $payload );
-
+	static function submitReview( $payload, $stringErrors = 'Failed review submit' ) {
 		$payloadJSON   = json_encode( $payload );
 		$headersString = self::curlHeaders( [
 			'"Content-Type: application/json"',
@@ -178,8 +185,48 @@ class GitHubAPI {
 
 		exec( $command, $execResult );
 
-		echo implode( "\n", $execResult );
+		$submitResult = json_decode( implode( " ", $execResult ), true );
+
+		if ( isset( $submitResult['message'] ) && 'Server Error' === $submitResult['message'] ) {
+			print_r( $stringErrors );
+		} else {
+			print_r( $payload );
+		}
 
 		self::maybeSleep();
+	}
+
+	static function editLongReviews() {
+		$headersString = self::curlHeaders( [
+			'"Content-Type: application/json"',
+		] );
+		$botUsername   = self::getTokenUsername();
+		$pRId          = Options::get( 'pr-id' );
+		$repoOwner     = Options::get( 'repo-owner' );
+		$repoName      = Options::get( 'repo-name' );
+		$url           = self::URL;
+
+		$command = "curl -s $headersString -X GET $url/repos/$repoOwner/$repoName/pulls/$pRId/reviews";
+
+		exec( $command, $execResult );
+
+		$reviews = json_decode( implode( "\n", $execResult ), true );
+
+		$stringLimit = 80;
+		foreach ( $reviews as $review ) {
+			if ( isset( $review['user']['login'], $review['id'] ) && $botUsername === $review['user']['login'] ) {
+				if ( 'CHANGES_REQUESTED' === $review['state'] && strlen( $review['body'] ) >= $stringLimit ) {
+					$reviewId   = $review['id'];
+					$body       = new stdClass();
+					$body->body = 'Check errors below';
+					$bodyString = json_encode( $body );
+					$command    = "curl -s -d '$bodyString' $headersString -X PUT $url/repos/$repoOwner/$repoName/pulls/$pRId/reviews/$reviewId";
+
+					exec( $command, $execResultReview );
+
+					echo "Edited review $reviewId" . PHP_EOL;
+				}
+			}
+		}
 	}
 }

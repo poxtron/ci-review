@@ -26,10 +26,15 @@ class PrepareFiles {
 		mkdir( $tempdir );
 
 		// copy files with directory structure to tmp dir
-		foreach ( $files as $file ) {
+		foreach ( $files as $key => $file ) {
 			$fileNameArray = explode( '.', $file );
 			$extension     = end( $fileNameArray );
-			if ( in_array( $extension, [ 'php', 'js', 'jsx', 'ts' ] ) ) {
+			if ( in_array( $extension, [ 'php' ] ) ) {
+				if ( strpos( $file, DIRECTORY_SEPARATOR . 'ShortcodeOutput' . DIRECTORY_SEPARATOR ) !== false ) {
+					unset($this->diffResults[$file]);
+					unset($files[$key]);
+					continue;
+				}
 				exec( "cd " . Options::get( 'repo-path' ) . " && cp --parents $file $tempdir" );
 			}
 		}
