@@ -22,7 +22,7 @@ class Options {
 	private $options = [];
 
 	/**
-	 * Options constructor.
+	 * Obtain all options passed to the script, check for required options and sanitize where needed.
 	 *
 	 * @throws Exception
 	 */
@@ -50,6 +50,11 @@ class Options {
 		}
 	}
 
+	/**
+	 * @param null|string $option Option name to be retrieved.
+	 *
+	 * @return false|false[]|mixed|string|string[] Option value.
+	 */
 	static function get( $option = null ) {
 		$options = self::instance()->options;
 

@@ -23,11 +23,11 @@ chown -R etstaging:etstaging "$BOT_WORKSPACE"
 
 cd "$BOT_WORKSPACE"/rules
 
-gosu etstaging bash -c "composer install"
+gosu etstaging bash -c "composer install -q"
 
 cd "$BOT_WORKSPACE"/review/eslint
 
-gosu etstaging bash -c "npm install"
+gosu etstaging bash -c "npm install -s"
 
 cd "$BOT_WORKSPACE"
 

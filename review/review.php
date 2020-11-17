@@ -10,7 +10,7 @@ if ( 'cli' !== php_sapi_name() ) {
 	die( 'This script can only run on CLI' );
 }
 
-// Autoloader
+// Autoloader.
 spl_autoload_register( __NAMESPACE__ . '\auto_loader' );
 
 /**
@@ -29,14 +29,9 @@ function auto_loader( $class_name ) {
 }
 
 try {
-	//RunESLint::instance();
-	// GitHubAPI::createReview();
-	print_r(RunPhpcs::getResults());
-	print_r(RunESLint::getResults());
+	GitHubAPI::createReview();
 	exit( 0 );
 } catch ( Exception $exception ) {
 	echo "ERROR: \n" . $exception->getMessage() . "\n";
 	exit( 1 );
 }
-
-//https://developer.github.com/v3/pulls/reviews/#create-a-review-for-a-pull-request/

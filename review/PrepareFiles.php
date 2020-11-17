@@ -12,7 +12,7 @@ class PrepareFiles {
 	private $diffResults = [];
 
 	/**
-	 * Run constructor.
+	 * Create a copy of the codebase only with modified files and store them on a temporary file.
 	 *
 	 * @throws Exception
 	 */
@@ -29,10 +29,10 @@ class PrepareFiles {
 		foreach ( $files as $key => $file ) {
 			$fileNameArray = explode( '.', $file );
 			$extension     = end( $fileNameArray );
-			if ( in_array( $extension, [ 'php', 'js', 'jsx', 'scss' ] ) ) {
+			if ( in_array( $extension, [ 'php', 'js', 'jsx' ] ) ) {
 				if ( strpos( $file, DIRECTORY_SEPARATOR . 'ShortcodeOutput' . DIRECTORY_SEPARATOR ) !== false ) {
-					unset($this->diffResults[$file]);
-					unset($files[$key]);
+					unset( $this->diffResults[ $file ] );
+					unset( $files[ $key ] );
 					continue;
 				}
 				exec( "cd " . Options::get( 'repo-path' ) . " && cp --parents $file $tmpDir" );
@@ -42,6 +42,9 @@ class PrepareFiles {
 		$this->filesDir = $tmpDir;
 	}
 
+	/**
+	 * @return array Array of modified files line numbers and diff positions.
+	 */
 	private function parseDiff() {
 		$diffArray = GitHubAPI::getDiff();
 
@@ -53,27 +56,27 @@ class PrepareFiles {
 		$result = [];
 
 		foreach ( $diffArray as $line ) {
-			// only look at lines in diff that we care
+			// Only look at lines in diff that we care.
 			if ( in_array( $line[0], [ '+', '@', ' ', '-' ] ) ) {
 
-				// old file name is not important.
+				// Old file name is not important.
 				if ( $line[0] . $line[1] === '--' ) {
 					continue;
 				}
 
-				// get new file name and reset diff position.
+				// Get new file name and reset diff position.
 				if ( $line[0] . $line[1] === '++' ) {
 					$currentFile = trim( str_replace( [ '+++', ' b/' ], '', $line ) );
 					$position    = -1;
 				}
 
-				// reset line number using hunk indicator.
+				// Reset line number using hunk indicator.
 				if ( $line[0] . $line[1] === '@@' ) {
 					$lineArray  = explode( ' ', $line );
 					$lineNumber = explode( ',', ltrim( $lineArray[2], '+' ) )[0];
 				}
 
-				// store only modified lines with line number and position on diff.
+				// Store only modified lines with line number and position on diff.
 				if ( $currentFile !== '/dev/null' && $position > 0 && $line[0] . $line[1] !== '@@' && $line[0] === '+' ) {
 					// TODO remove below legacy/testing string
 					array_push( $modifiedFiles, "$currentFile:$lineNumber $position" . ' ' . trim( $line ) );
@@ -84,12 +87,12 @@ class PrepareFiles {
 					$result[ $currentFile ] = array_merge( $result[ $currentFile ], [ "+$lineNumber" => $position ] );
 				}
 
-				// increase line number if current line is modified or new.
+				// Increase line number if current line is modified or new.
 				if ( ! in_array( $line[0], [ '-', '@' ] ) ) {
 					$lineNumber++;
 				}
 
-				// increase diff position needed for commenting.
+				// Increase diff position needed for commenting.
 				$position++;
 			}
 		}
