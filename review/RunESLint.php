@@ -24,7 +24,7 @@ class RunESLint {
 		$eslint       = realpath( '../eslint/node_modules/.bin/eslint' );
 		$config       = realpath( '../eslint/.eslintrc.json' );
 		$tmpJson      = $tmpDir . DIRECTORY_SEPARATOR . 'report.json';
-		$phpcsCommand = "$eslint -c $config \"$tmpDir/**\" -f json > $tmpJson";
+		$phpcsCommand = "node $eslint -c $config \"$tmpDir/**\" -f json > $tmpJson";
 		exec( $phpcsCommand, $cmd_result );
 
 		$fileArray = json_decode( file_get_contents( $tmpJson ), true );
