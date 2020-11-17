@@ -235,17 +235,18 @@ class GitHubAPI {
 		$stringLimit = 80;
 		foreach ( $reviews as $review ) {
 			if ( isset( $review['user']['login'], $review['id'] ) && $botUsername === $review['user']['login'] ) {
+				$reviewId   = $review['id'];
+				$body       = new stdClass();
 				if ( 'CHANGES_REQUESTED' === $review['state'] && strlen( $review['body'] ) >= $stringLimit ) {
-					$reviewId   = $review['id'];
-					$body       = new stdClass();
 					$body->body = 'Check errors below';
-					$bodyString = json_encode( $body );
-					$command    = "curl -s -d '$bodyString' $headersString -X PUT $url/repos/$repoOwner/$repoName/pulls/$pRId/reviews/$reviewId";
-
-					exec( $command, $execResultReview );
-
 					echo "Edited review $reviewId" . PHP_EOL;
+				} elseif('APPROVED' === $review['state']){
+					$body->body = 'Check results below :arrow_double_down:';
 				}
+				$bodyString = json_encode( $body );
+				$command    = "curl -s -d '$bodyString' $headersString -X PUT $url/repos/$repoOwner/$repoName/pulls/$pRId/reviews/$reviewId";
+
+				exec( $command, $execResultReview );
 			}
 		}
 	}
