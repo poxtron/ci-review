@@ -12,27 +12,31 @@ class RunPhpcs {
 	 * RunPhpcs constructor.
 	 */
 	private function __construct() {
-		$tempdir    = PrepareFiles::getFilesDir();
+		$tmpDir     = PrepareFiles::getFilesDir();
 		$filesLines = [];
 
 		foreach ( PrepareFiles::getDiffResults() as $file => $data ) {
-			foreach ( $data as $line => $position ) {
-				array_push( $filesLines, "$file:" . ltrim( $line, '+' ) );
+			// Force check only on php files because phpcs sometimes doesn't care
+			$fileExploded = explode( '.', $file );
+			if ( 'php' === end( $fileExploded ) ) {
+				foreach ( $data as $line => $position ) {
+					array_push( $filesLines, "$file:" . ltrim( $line, '+' ) );
+				}
 			}
 		}
 
 		// run phpcs on tmp dir
 		$phpcs        = Options::get( 'phpcs-path' );
 		$standard     = Options::get( 'phpcs-standard' );
-		$tmpJson      = $tempdir . DIRECTORY_SEPARATOR . 'report.json';
-		$phpcsCommand = "$phpcs --standard=$standard --extensions=php --report=json --report-file=$tmpJson $tempdir";
+		$tmpJson      = $tmpDir . DIRECTORY_SEPARATOR . 'report.json';
+		$phpcsCommand = "$phpcs --standard=$standard --extensions=php --report=json --report-file=$tmpJson $tmpDir";
 		exec( escapeshellcmd( $phpcsCommand ), $result );
 
 		$fileArray = json_decode( file_get_contents( $tmpJson ), true );
 
 		$ignoreReason = $standard . DIRECTORY_SEPARATOR . 'IgnoreReason';
 		if ( file_exists( $ignoreReason ) ) {
-			$phpcsCommand = "$phpcs --standard=$ignoreReason --extensions=php --report=json --report-file=$tmpJson --ignore-annotations $tempdir";
+			$phpcsCommand = "$phpcs --standard=$ignoreReason --extensions=php --report=json --report-file=$tmpJson --ignore-annotations $tmpDir";
 			exec( escapeshellcmd( $phpcsCommand ), $result );
 			$ignoreArray = json_decode( file_get_contents( $tmpJson ), true );
 			foreach ( $ignoreArray['files'] as $fileName => $fileResults ) {
@@ -47,21 +51,21 @@ class RunPhpcs {
 			}
 		}
 
-		$errors    = 0;
-		$warnings  = 0;
-		$results   = [];
+		$errors   = 0;
+		$warnings = 0;
+		$results  = [];
 
 		// Filter phpcs json results to only get modified lines.
 		foreach ( $fileArray['files'] as $fileName => $fileResults ) {
 			if ( ! empty( $fileResults['messages'] ) ) {
-				$cleanName = str_replace( $tempdir . DIRECTORY_SEPARATOR, '', $fileName );
+				$cleanName = str_replace( $tmpDir . DIRECTORY_SEPARATOR, '', $fileName );
 				foreach ( $fileResults['messages'] as $message ) {
 					if ( in_array( "$cleanName:{$message['line']}", $filesLines ) ) {
 						if ( ! isset( $results[ $cleanName ] ) ) {
 							$results[ $cleanName ] = [];
 						}
 						$results[ $cleanName ][] = $message;
-						if ( $message['type'] === 'WARNING' ) {
+						if ( 'WARNING' === $message['type'] ) {
 							$warnings++;
 						} else {
 							$errors++;

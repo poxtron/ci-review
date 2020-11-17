@@ -20,26 +20,26 @@ class PrepareFiles {
 		$files = array_keys( $this->parseDiff() );
 
 		// create tmp dir
-		$tempfile = tempnam( sys_get_temp_dir(), '' );
-		unlink( $tempfile );
-		$tempdir = "{$tempfile}data";
-		mkdir( $tempdir );
+		$tmpFile = tempnam( sys_get_temp_dir(), '' );
+		unlink( $tmpFile );
+		$tmpDir = "{$tmpFile}data";
+		mkdir( $tmpDir );
 
 		// copy files with directory structure to tmp dir
 		foreach ( $files as $key => $file ) {
 			$fileNameArray = explode( '.', $file );
 			$extension     = end( $fileNameArray );
-			if ( in_array( $extension, [ 'php' ] ) ) {
+			if ( in_array( $extension, [ 'php', 'js', 'jsx', 'scss' ] ) ) {
 				if ( strpos( $file, DIRECTORY_SEPARATOR . 'ShortcodeOutput' . DIRECTORY_SEPARATOR ) !== false ) {
 					unset($this->diffResults[$file]);
 					unset($files[$key]);
 					continue;
 				}
-				exec( "cd " . Options::get( 'repo-path' ) . " && cp --parents $file $tempdir" );
+				exec( "cd " . Options::get( 'repo-path' ) . " && cp --parents $file $tmpDir" );
 			}
 		}
 
-		$this->filesDir = $tempdir;
+		$this->filesDir = $tmpDir;
 	}
 
 	private function parseDiff() {
@@ -99,6 +99,9 @@ class PrepareFiles {
 		return $this->diffResults;
 	}
 
+	/**
+	 * @return string Temporal dir where the code to be lint is stored, without trailing slash.
+	 */
 	static function getFilesDir() {
 		return self::instance()->filesDir;
 	}
@@ -114,6 +117,11 @@ class PrepareFiles {
 		return self::$instance;
 	}
 
+	/**
+	 * + sign is added to the line number to force string value on array key.
+	 *
+	 * @return array [ fileName => [ +lineNumber => diffPosition, ...] ...]
+	 */
 	static function getDiffResults() {
 		return self::instance()->diffResults;
 	}

@@ -30,7 +30,10 @@ function auto_loader( $class_name ) {
 
 try {
 	//RunESLint::instance();
-	GitHubAPI::createReview();
+	// GitHubAPI::createReview();
+	print_r(RunPhpcs::getResults());
+	print_r(RunESLint::getResults());
+	exit( 0 );
 } catch ( Exception $exception ) {
 	echo "ERROR: \n" . $exception->getMessage() . "\n";
 	exit( 1 );

@@ -16,7 +16,9 @@ RUN set -eux; \
 	vim \
 	zip \
 	wget \
-	git;
+	git \
+    && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+    && apt-install nodejs
 
 RUN useradd -m -s /bin/bash etstaging
 
