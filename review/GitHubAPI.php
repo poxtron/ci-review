@@ -121,7 +121,19 @@ class GitHubAPI {
 				}
 			}
 
-			if ( $totalErrorsWarnings >= 100 ) {
+			// Group errors that are on the same line.
+			foreach($payload->comments as $key => $comment){
+				$comments2 = $payload->comments;
+				unset($comments2[$key]);
+				foreach($comments2 as $key2 => $comment2){
+					if($comment2['position'] === $comment['position']){
+						$payload->comments[$key]['body'] .= $comment2['body'];
+						unset($payload->comments[$key2]);
+					}
+				}
+			}
+
+			if ( count($payload->comments) >= 100 ) {
 				unset( $payload->comments );
 				$payload->body .= $stringErrors;
 			}
