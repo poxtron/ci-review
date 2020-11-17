@@ -122,18 +122,23 @@ class GitHubAPI {
 			}
 
 			// Group errors that are on the same line.
-			foreach($payload->comments as $key => $comment){
+			foreach ( $payload->comments as $key => $comment ) {
+				if ( ! isset( $payload->comments[ $key ] ) ) {
+					continue;
+				}
 				$comments2 = $payload->comments;
-				unset($comments2[$key]);
-				foreach($comments2 as $key2 => $comment2){
-					if($comment2->position === $comment->position){
-						$payload->comments[$key]->body .= $comment2->body;
-						unset($payload->comments[$key2]);
+				unset( $comments2[ $key ] );
+				foreach ( $comments2 as $key2 => $comment2 ) {
+					if ( $comment2->position === $comment->position ) {
+						$payload->comments[ $key ]->body .= "\n\r" . $comment2->body;
+						unset( $payload->comments[ $key2 ] );
 					}
 				}
 			}
 
-			if ( count($payload->comments) >= 100 ) {
+			$payload->comments = array_values($payload->comments);
+
+			if ( count( $payload->comments ) >= 100 ) {
 				unset( $payload->comments );
 				$payload->body .= $stringErrors;
 			}
@@ -153,7 +158,7 @@ class GitHubAPI {
 				":golfing: Hole in one! No issues found! ",
 			];
 
-			$payload->body = $botMessages[ (int) rand( 0, count($botMessages) - 1 ) ];
+			$payload->body = $botMessages[ (int) rand( 0, count( $botMessages ) - 1 ) ];
 
 			self::submitReview( $payload );
 
@@ -235,12 +240,12 @@ class GitHubAPI {
 		$stringLimit = 80;
 		foreach ( $reviews as $review ) {
 			if ( isset( $review['user']['login'], $review['id'] ) && $botUsername === $review['user']['login'] ) {
-				$reviewId   = $review['id'];
-				$body       = new stdClass();
+				$reviewId = $review['id'];
+				$body     = new stdClass();
 				if ( 'CHANGES_REQUESTED' === $review['state'] && strlen( $review['body'] ) >= $stringLimit ) {
 					$body->body = 'Check errors below :arrow_double_down:';
 					echo "Edited review $reviewId" . PHP_EOL;
-				} elseif('APPROVED' === $review['state']){
+				} elseif ( 'APPROVED' === $review['state'] ) {
 					$body->body = 'Check results below :arrow_double_down:';
 				}
 				$bodyString = json_encode( $body );
@@ -252,7 +257,7 @@ class GitHubAPI {
 	}
 
 	/**
-	 * @param object $payload The object to be sent to GitHub API.
+	 * @param object $payload      The object to be sent to GitHub API.
 	 * @param string $stringErrors All of the warnings and errors on the review, if the POST to GitHub API fails it will print them on the action.
 	 */
 	static function submitReview( $payload, $stringErrors = 'Failed review submit' ) {
