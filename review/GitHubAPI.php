@@ -104,7 +104,7 @@ class GitHubAPI {
 
 			$results = array_merge( $phpcs['results'], $eslint['results'] );
 
-			foreach ( $results['results'] as $file => $messages ) {
+			foreach ( $results as $file => $messages ) {
 				if ( isset( $diffResults[ $file ] ) ) {
 					foreach ( $messages as $message ) {
 						$line = "+{$message['line']}";
@@ -141,7 +141,7 @@ class GitHubAPI {
 				":golfing: Hole in one! No issues found! ",
 			];
 
-			$payload->body = $botMessages[ (int) rand( 0, 4 ) ];
+			$payload->body = $botMessages[ (int) rand( 0, count($botMessages) - 1 ) ];
 
 			self::submitReview( $payload );
 
