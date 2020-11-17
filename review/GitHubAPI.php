@@ -126,7 +126,7 @@ class GitHubAPI {
 				$comments2 = $payload->comments;
 				unset($comments2[$key]);
 				foreach($comments2 as $key2 => $comment2){
-					if($comment2['position'] === $comment['position']){
+					if($comment2->position === $comment->position){
 						$payload->comments[$key]['body'] .= $comment2['body'];
 						unset($payload->comments[$key2]);
 					}
