@@ -127,7 +127,7 @@ class GitHubAPI {
 				unset($comments2[$key]);
 				foreach($comments2 as $key2 => $comment2){
 					if($comment2->position === $comment->position){
-						$payload->comments[$key]['body'] .= $comment2['body'];
+						$payload->comments[$key]->body .= $comment2->body;
 						unset($payload->comments[$key2]);
 					}
 				}
@@ -238,7 +238,7 @@ class GitHubAPI {
 				$reviewId   = $review['id'];
 				$body       = new stdClass();
 				if ( 'CHANGES_REQUESTED' === $review['state'] && strlen( $review['body'] ) >= $stringLimit ) {
-					$body->body = 'Check errors below';
+					$body->body = 'Check errors below :arrow_double_down:';
 					echo "Edited review $reviewId" . PHP_EOL;
 				} elseif('APPROVED' === $review['state']){
 					$body->body = 'Check results below :arrow_double_down:';
