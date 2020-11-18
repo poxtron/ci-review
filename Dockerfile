@@ -17,8 +17,12 @@ RUN set -eux; \
 	zip \
 	wget \
 	git \
+    && curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    && echo 'deb https://dl.yarnpkg.com/debian/ stable main' > /etc/apt/sources.list.d/yarn.list \
     && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
-    && apt-install nodejs
+    && apt-install nodejs yarn -y \
+    && unlink /usr/bin/npm \
+    && ln -s /usr/bin/yarn /usr/bin/npm
 
 RUN useradd -m -s /bin/bash etstaging
 

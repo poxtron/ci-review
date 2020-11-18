@@ -27,7 +27,7 @@ gosu etstaging bash -c "composer install -q"
 
 cd "$BOT_WORKSPACE"/review/eslint
 
-gosu etstaging bash -c "npm install -s"
+gosu etstaging bash -c "yarn install -s"
 
 cd "$BOT_WORKSPACE"
 
