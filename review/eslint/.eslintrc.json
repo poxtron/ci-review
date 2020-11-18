@@ -1,4 +1,7 @@
 {
+  "extends": "@elegantthemes",
   "parser": "babel-eslint",
-  "extends": "@elegantthemes"
+  "rules": {
+    "jsdoc/no-types": 0
+  }
 }
