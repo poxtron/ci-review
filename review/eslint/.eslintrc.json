@@ -2,6 +2,7 @@
   "extends": "@elegantthemes",
   "parser": "babel-eslint",
   "rules": {
-    "jsdoc/no-types": 0
+    "jsdoc/no-types": 0,
+    "import/no-unresolved": 0
   }
 }
