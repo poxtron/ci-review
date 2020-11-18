@@ -136,7 +136,7 @@ class GitHubAPI {
 				}
 			}
 
-			$payload->comments = array_values($payload->comments);
+			$payload->comments = array_values( $payload->comments );
 
 			if ( count( $payload->comments ) >= 100 ) {
 				unset( $payload->comments );
@@ -237,21 +237,23 @@ class GitHubAPI {
 
 		$reviews = json_decode( implode( "\n", $execResult ), true );
 
-		$stringLimit = 80;
 		foreach ( $reviews as $review ) {
 			if ( isset( $review['user']['login'], $review['id'] ) && $botUsername === $review['user']['login'] ) {
 				$reviewId = $review['id'];
 				$body     = new stdClass();
-				if ( 'CHANGES_REQUESTED' === $review['state'] && strlen( $review['body'] ) >= $stringLimit ) {
-					$body->body = 'Check errors below :arrow_double_down:';
-					echo "Edited review $reviewId" . PHP_EOL;
+				if ( 'CHANGES_REQUESTED' === $review['state'] ) {
+					$body->body = ':arrow_double_down:';
 				} elseif ( 'APPROVED' === $review['state'] ) {
-					$body->body = 'Check results below :arrow_double_down:';
+					$body->body = ':arrow_double_down:';
 				}
-				$bodyString = json_encode( $body );
-				$command    = "curl -s -d '$bodyString' $headersString -X PUT $url/repos/$repoOwner/$repoName/pulls/$pRId/reviews/$reviewId";
 
-				exec( $command, $execResultReview );
+				if ( in_array( $review['state'], [ 'CHANGES_REQUESTED', 'APPROVED' ] ) ) {
+					echo "Edited review $reviewId" . PHP_EOL;
+					$bodyString = json_encode( $body );
+					$command    = "curl -s -d '$bodyString' $headersString -X PUT $url/repos/$repoOwner/$repoName/pulls/$pRId/reviews/$reviewId";
+
+					exec( $command, $execResultReview );
+				}
 			}
 		}
 	}
@@ -278,7 +280,9 @@ class GitHubAPI {
 		$submitResult = json_decode( implode( " ", $execResult ), true );
 
 		if ( isset( $submitResult['message'] ) && 'Server Error' === $submitResult['message'] ) {
+			echo $submitResult['message'] . PHP_EOL;
 			print_r( $stringErrors );
+			exit( 1 );
 		} else {
 			print_r( $payload );
 		}
