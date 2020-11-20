@@ -1,4 +1,4 @@
-FROM elegantthemes/php:7.2.13
+FROM elegantthemes/php:7.4.9
 
 LABEL "com.github.actions.icon"="check-circle"
 LABEL "com.github.actions.color"="orange"
