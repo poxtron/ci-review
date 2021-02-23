@@ -80,11 +80,14 @@ class GitHubAPI {
 		$phpcsErrors   = $phpcs['errors'] > 0 ? ":no_entry_sign: {$phpcs['errors']} Errors\n\r" : '';
 		$phpcsWarnings = $phpcs['warnings'] > 0 ? ":warning: {$phpcs['warnings']} Warnings\n\r" : '';
 
-		$eslint         = RunESLint::getResults();
-		$eslintErrors   = $eslint['errors'] > 0 ? ":no_entry_sign: {$eslint['errors']} Errors\n\r" : '';
-		$eslintWarnings = $eslint['warnings'] > 0 ? ":warning: {$eslint['warnings']} Warnings\n\r" : '';
-
-		$totalErrorsWarnings = $phpcs['errors'] + $phpcs['warnings'] + $eslint['errors'] + $eslint['warnings'];
+		if ( do_eslint() ) {
+			$eslint              = RunESLint::getResults();
+			$eslintErrors        = $eslint['errors'] > 0 ? ":no_entry_sign: {$eslint['errors']} Errors\n\r" : '';
+			$eslintWarnings      = $eslint['warnings'] > 0 ? ":warning: {$eslint['warnings']} Warnings\n\r" : '';
+			$totalErrorsWarnings = $phpcs['errors'] + $phpcs['warnings'] + $eslint['errors'] + $eslint['warnings'];
+		} else {
+			$totalErrorsWarnings = $phpcs['errors'] + $phpcs['warnings'];
+		}
 
 		// JSON Payload.
 		$payload            = new stdClass();
@@ -94,15 +97,25 @@ class GitHubAPI {
 		self::deletePRComments();
 
 		if ( 'REQUEST_CHANGES' === $payload->event ) {
-			$payload->body     = $phpcs['errors'] + $phpcs['warnings'] > 0 ? "**phpcs** results:\n\r$phpcsErrors$phpcsWarnings" : '';
-			$payload->body     .= $eslint['errors'] + $eslint['warnings'] > 0 ? "**eslint** results:\n\r$eslintErrors$eslintWarnings" : '';
+			$payload->body = $phpcs['errors'] + $phpcs['warnings'] > 0 ? "**phpcs** results:\n\r$phpcsErrors$phpcsWarnings" : '';
+
+			if ( do_eslint() ) {
+				/** @noinspection PhpUndefinedVariableInspection */
+				$payload->body .= $eslint['errors'] + $eslint['warnings'] > 0 ? "**eslint** results:\n\r$eslintErrors$eslintWarnings" : '';
+			}
+
 			$payload->comments = [];
 
 			$stringErrors = '';
 
 			$diffResults = PrepareFiles::getDiffResults();
 
-			$results = array_merge( $phpcs['results'], $eslint['results'] );
+			if( do_eslint() ){
+				/** @noinspection PhpUndefinedVariableInspection */
+				$results = array_merge( $phpcs['results'], $eslint['results'] );
+			} else {
+				$results = $phpcs['results'];
+			}
 
 			foreach ( $results as $file => $messages ) {
 				if ( isset( $diffResults[ $file ] ) ) {

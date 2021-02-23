@@ -6,6 +6,13 @@ if [[ -z "$GH_BOT_TOKEN" ]]; then
     exit 1
 fi
 
+BODY=$(cat $GITHUB_EVENT_PATH | jq -r '.pull_request.body')
+if [[ "[do_eslint]" == *"$BODY"* ]]; then
+	DO_ESLINT=true
+else
+	DO_ESLINT=false
+fi
+
 COMMIT_ID=$(cat $GITHUB_EVENT_PATH | jq -r '.pull_request.head.sha')
 PR_ID=$(cat "$GITHUB_EVENT_PATH" | jq -r .pull_request.number)
 BASE_BRANCH=$(cat "$GITHUB_EVENT_PATH" | jq -r .pull_request.base.ref)
@@ -25,9 +32,10 @@ cd "$BOT_WORKSPACE"/rules
 
 gosu etstaging bash -c "composer install -q"
 
-cd "$BOT_WORKSPACE"/review/eslint
-
-gosu etstaging bash -c "yarn install -s"
+if [ "$DO_ESLINT" = true ]; then
+	cd "$BOT_WORKSPACE"/review/eslint
+	gosu etstaging bash -c "yarn install -s"
+fi
 
 cd "$BOT_WORKSPACE"
 

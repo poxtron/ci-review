@@ -27,9 +27,10 @@ class PrepareFiles {
 
 		// copy files with directory structure to tmp dir
 		foreach ( $files as $key => $file ) {
-			$fileNameArray = explode( '.', $file );
-			$extension     = end( $fileNameArray );
-			if ( in_array( $extension, [ 'php', 'js', 'jsx' ] ) ) {
+			$fileNameArray  = explode( '.', $file );
+			$extension      = end( $fileNameArray );
+			$fileExtensions = do_eslint() ? [ 'php', 'js', 'jsx' ] : [ 'php' ];
+			if ( in_array( $extension, $fileExtensions ) ) {
 				if ( strpos( $file, DIRECTORY_SEPARATOR . 'ShortcodeOutput' . DIRECTORY_SEPARATOR ) !== false ) {
 					unset( $this->diffResults[ $file ] );
 					unset( $files[ $key ] );
@@ -48,17 +49,15 @@ class PrepareFiles {
 	private function parseDiff() {
 		$diffArray = GitHubAPI::getDiff();
 
-		$position      = 0;
-		$lineNumber    = 0;
-		$modifiedFiles = [];
-		$currentFile   = '';
+		$position    = 0;
+		$lineNumber  = 0;
+		$currentFile = '';
 
 		$result = [];
 
 		foreach ( $diffArray as $line ) {
 			// Only look at lines in diff that we care.
 			if ( in_array( $line[0], [ '+', '@', ' ', '-' ] ) ) {
-
 				// Old file name is not important.
 				if ( $line[0] . $line[1] === '--' ) {
 					continue;
@@ -78,9 +77,6 @@ class PrepareFiles {
 
 				// Store only modified lines with line number and position on diff.
 				if ( $currentFile !== '/dev/null' && $position > 0 && $line[0] . $line[1] !== '@@' && $line[0] === '+' ) {
-					// TODO remove below legacy/testing string
-					array_push( $modifiedFiles, "$currentFile:$lineNumber $position" . ' ' . trim( $line ) );
-
 					if ( ! isset( $result[ $currentFile ] ) ) {
 						$result[ $currentFile ] = [];
 					}

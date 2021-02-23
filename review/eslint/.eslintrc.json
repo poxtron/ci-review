@@ -3,6 +3,16 @@
   "parser": "babel-eslint",
   "rules": {
     "jsdoc/no-types": 0,
-    "import/no-unresolved": 0
+    "import/no-unresolved": 0,
+    "no-invalid-this": 0
+  },
+  "globals": {
+    "$": true,
+    "document": true,
+    "ETBuilder": true,
+    "ETBuilderBackend": true,
+    "jQuery": true,
+    "navigator": true,
+    "window": true
   }
 }

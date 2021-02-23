@@ -28,6 +28,10 @@ function auto_loader( $class_name ) {
 	}
 }
 
+function do_eslint() {
+	return 'true' === getenv( 'DO_ESLINT' );
+}
+
 try {
 	GitHubAPI::createReview();
 	exit( 0 );
