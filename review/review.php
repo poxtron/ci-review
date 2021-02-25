@@ -29,7 +29,6 @@ function auto_loader( $class_name ) {
 }
 
 try {
-	var_dump(Options::get('do_eslint'));
 	GitHubAPI::createReview();
 	exit( 0 );
 } catch ( Exception $exception ) {
