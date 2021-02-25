@@ -11,9 +11,9 @@ BODY=$(cat $GITHUB_EVENT_PATH | jq -r '.pull_request.body')
 echo "$BODY"
 
 if [[ "[do_eslint]" == *"$BODY"* ]]; then
-	DO_ESLINT=true
+	DO_ESLINT='true'
 else
-	DO_ESLINT=false
+	DO_ESLINT='false'
 fi
 
 COMMIT_ID=$(cat $GITHUB_EVENT_PATH | jq -r '.pull_request.head.sha')
