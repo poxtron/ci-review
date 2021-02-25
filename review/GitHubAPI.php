@@ -80,7 +80,7 @@ class GitHubAPI {
 		$phpcsErrors   = $phpcs['errors'] > 0 ? ":no_entry_sign: {$phpcs['errors']} Errors\n\r" : '';
 		$phpcsWarnings = $phpcs['warnings'] > 0 ? ":warning: {$phpcs['warnings']} Warnings\n\r" : '';
 
-		if ( do_eslint() ) {
+		if ( Options::get('do_eslint') ) {
 			$eslint              = RunESLint::getResults();
 			$eslintErrors        = $eslint['errors'] > 0 ? ":no_entry_sign: {$eslint['errors']} Errors\n\r" : '';
 			$eslintWarnings      = $eslint['warnings'] > 0 ? ":warning: {$eslint['warnings']} Warnings\n\r" : '';
@@ -99,7 +99,7 @@ class GitHubAPI {
 		if ( 'REQUEST_CHANGES' === $payload->event ) {
 			$payload->body = $phpcs['errors'] + $phpcs['warnings'] > 0 ? "**phpcs** results:\n\r$phpcsErrors$phpcsWarnings" : '';
 
-			if ( do_eslint() ) {
+			if ( Options::get('do_eslint') ) {
 				/** @noinspection PhpUndefinedVariableInspection */
 				$payload->body .= $eslint['errors'] + $eslint['warnings'] > 0 ? "**eslint** results:\n\r$eslintErrors$eslintWarnings" : '';
 			}
@@ -110,7 +110,7 @@ class GitHubAPI {
 
 			$diffResults = PrepareFiles::getDiffResults();
 
-			if( do_eslint() ){
+			if( Options::get('do_eslint') ){
 				/** @noinspection PhpUndefinedVariableInspection */
 				$results = array_merge( $phpcs['results'], $eslint['results'] );
 			} else {

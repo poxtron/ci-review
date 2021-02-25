@@ -29,7 +29,7 @@ class PrepareFiles {
 		foreach ( $files as $key => $file ) {
 			$fileNameArray  = explode( '.', $file );
 			$extension      = end( $fileNameArray );
-			$fileExtensions = do_eslint() ? [ 'php', 'js', 'jsx' ] : [ 'php' ];
+			$fileExtensions = Options::get('do_eslint') ? [ 'php', 'js', 'jsx' ] : [ 'php' ];
 			if ( in_array( $extension, $fileExtensions ) ) {
 				if ( strpos( $file, DIRECTORY_SEPARATOR . 'ShortcodeOutput' . DIRECTORY_SEPARATOR ) !== false ) {
 					unset( $this->diffResults[ $file ] );

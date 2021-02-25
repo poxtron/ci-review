@@ -28,12 +28,8 @@ function auto_loader( $class_name ) {
 	}
 }
 
-function do_eslint() {
-	var_dump(Options::get('do_eslint'));
-	return 'true' === Options::get('do_eslint');
-}
-
 try {
+	var_dump(Options::get('do_eslint'));
 	GitHubAPI::createReview();
 	exit( 0 );
 } catch ( Exception $exception ) {

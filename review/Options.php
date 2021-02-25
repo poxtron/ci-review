@@ -46,6 +46,8 @@ class Options {
 			$this->options['repo-path'] = substr( trim( $this->options['repo-path'] ), 0, -1 );
 		}
 
+		$this->options['do_eslint'] = 'true' === $this->options['do_eslint'];
+
 		if ( ! file_exists( $this->options['repo-path'] ) ) {
 			throw new Exception( 'Repo path is not valid.' );
 		}
