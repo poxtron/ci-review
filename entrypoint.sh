@@ -8,12 +8,10 @@ fi
 
 BODY=$(cat $GITHUB_EVENT_PATH | jq -r '.pull_request.body')
 
-echo "$BODY"
+DO_ESLINT='false'
 
 if [[ "[do_eslint]" == *"$BODY"* ]]; then
 	DO_ESLINT='true'
-else
-	DO_ESLINT='false'
 fi
 
 COMMIT_ID=$(cat $GITHUB_EVENT_PATH | jq -r '.pull_request.head.sha')
@@ -42,4 +40,4 @@ fi
 
 cd "$BOT_WORKSPACE"
 
-gosu etstaging bash -c "./review/review.php --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --repo-path=$BOT_WORKSPACE/repo --token=$GH_BOT_TOKEN --base-branch=$BASE_BRANCH --pr-id=$PR_ID --phpcs-path=$PHPCS_PATH --phpcs-standard=$PHPCS_STANDARD --commit=$COMMIT_ID"
+gosu etstaging bash -c "./review/review.php --do_eslint=$DO_ESLINT --repo-owner=$GITHUB_REPO_OWNER --repo-name=$GITHUB_REPO_NAME --repo-path=$BOT_WORKSPACE/repo --token=$GH_BOT_TOKEN --base-branch=$BASE_BRANCH --pr-id=$PR_ID --phpcs-path=$PHPCS_PATH --phpcs-standard=$PHPCS_STANDARD --commit=$COMMIT_ID"

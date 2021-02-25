@@ -15,6 +15,7 @@ class Options {
 		'base-branch:',
 		'pr-id:',
 		'commit:',
+		'do_eslint:',
 	];
 
 	private static $instance = null;

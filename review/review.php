@@ -29,8 +29,7 @@ function auto_loader( $class_name ) {
 }
 
 function do_eslint() {
-	print_r(getenv());
-	return 'true' === getenv( 'DO_ESLINT' );
+	return 'true' === Options::get('do_eslint');
 }
 
 try {
