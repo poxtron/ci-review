@@ -8,7 +8,7 @@ fi
 
 BODY=$(cat $GITHUB_EVENT_PATH | jq -r '.pull_request.body')
 
-echo BODY
+echo "$BODY"
 
 if [[ "[do_eslint]" == *"$BODY"* ]]; then
 	DO_ESLINT=true
