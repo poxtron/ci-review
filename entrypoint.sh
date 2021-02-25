@@ -7,6 +7,9 @@ if [[ -z "$GH_BOT_TOKEN" ]]; then
 fi
 
 BODY=$(cat $GITHUB_EVENT_PATH | jq -r '.pull_request.body')
+
+echo BODY
+
 if [[ "[do_eslint]" == *"$BODY"* ]]; then
 	DO_ESLINT=true
 else
