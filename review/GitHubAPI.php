@@ -260,6 +260,9 @@ class GitHubAPI {
 					$body->body = ':arrow_double_down:';
 				}
 
+				// TODO avoid editing reviews that where edited before
+				print_r($review);
+
 				if ( in_array( $review['state'], [ 'CHANGES_REQUESTED', 'APPROVED' ] ) ) {
 					echo "Edited review $reviewId" . PHP_EOL;
 					$bodyString = json_encode( $body );
