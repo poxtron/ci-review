@@ -108,21 +108,21 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@elegantthemes/eslint-config-base@1.0.0-beta.2":
-  version "1.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@elegantthemes/eslint-config-base/-/eslint-config-base-1.0.0-beta.2.tgz#a9766d4f45ead0f0e42e9e17e399af4616c7ce5e"
-  integrity sha512-ZFLb1ALq3Xacaw0DVlJ05LwvY6dekqzdWoMXPmBexnW8hDnS0WUffGGEbF8oqvZulJjucorLx8BNbyue+wElKw==
+"@elegantthemes/eslint-config-base@1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@elegantthemes/eslint-config-base/-/eslint-config-base-1.0.3.tgz#16950bde8421d64cb0eefce8d6013056729c19e1"
+  integrity sha512-nYwqk2Y9ODhPBrRbwfq9ZAg+NGSrfQfUmjD28qc/6zpZpnImiddtxc7erPblRFal/CEgS2IbJVdv0Qic9qykbw==
   dependencies:
     confusing-browser-globals "1.0.9"
     object.assign "4.1.0"
     object.entries "1.1.2"
 
-"@elegantthemes/eslint-config@^1.0.0-beta.2":
-  version "1.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@elegantthemes/eslint-config/-/eslint-config-1.0.0-beta.2.tgz#5661cda1dc329ba846e826e9c5133d2dea91233f"
-  integrity sha512-zXrYCEOpJW8Spok8lKTUvrPwo6u25QqgQHTWLclc77eGed+b0rGHStTrPlVcFdD5fYZ+VQl404InC0Ztv2a+FQ==
+"@elegantthemes/eslint-config@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@elegantthemes/eslint-config/-/eslint-config-1.0.1.tgz#aa009d562fc11e9c0762723b2b6accac53213914"
+  integrity sha512-te3XYTXO7mhSK3HGiybqLJvzPqWonree8DskIjzJwPUmc7ZTJXJsv9pV6Qd2n/y9Dc+ivqWmhoR8UBMlKeJtRw==
   dependencies:
-    "@elegantthemes/eslint-config-base" "1.0.0-beta.2"
+    "@elegantthemes/eslint-config-base" "1.0.3"
     object.assign "4.1.0"
     object.entries "1.1.2"
 
@@ -1009,9 +1009,9 @@ locate-path@^2.0.0:
     path-exists "^3.0.0"
 
 lodash@^4.17.14, lodash@^4.17.19, lodash@^4.17.20:
-  version "4.17.20"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
-  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
 loose-envify@^1.4.0:
   version "1.4.0"
